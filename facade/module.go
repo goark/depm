@@ -5,31 +5,22 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/spiegel-im-spiegel/depm/dependency"
-	"github.com/spiegel-im-spiegel/depm/dependency/pkgjson"
+	"github.com/spiegel-im-spiegel/depm/dependency/modjson"
 	"github.com/spiegel-im-spiegel/depm/golist"
+	"github.com/spiegel-im-spiegel/depm/modules"
 	"github.com/spiegel-im-spiegel/depm/packages"
 	"github.com/spiegel-im-spiegel/errs"
 	"github.com/spiegel-im-spiegel/gocli/rwi"
 )
 
-//newPackageCmd returns cobra.Command instance for show sub-command
-func newPackageCmd(ui *rwi.RWI) *cobra.Command {
-	packageCmd := &cobra.Command{
-		Use:     "package [flags] [package import path]",
-		Aliases: []string{"pkg", "p"},
-		Short:   "Visualize depndency packages",
-		Long:    "Visualize depndency packages.",
+//newModuleCmd returns cobra.Command instance for show sub-command
+func newModuleCmd(ui *rwi.RWI) *cobra.Command {
+	moduleCmd := &cobra.Command{
+		Use:     "module [flags] [package import path]",
+		Aliases: []string{"mod", "m"},
+		Short:   "Visualize depndency modules",
+		Long:    "Visualize depndency modules.",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			//Options
-			includeInternal, err := cmd.Flags().GetBool("include-internal")
-			if err != nil {
-				return debugPrint(ui, errs.New("Error in --include-internal option", errs.WithCause(err)))
-			}
-			includeStd, err := cmd.Flags().GetBool("include-standard")
-			if err != nil {
-				return debugPrint(ui, errs.New("Error in --include-standard option", errs.WithCause(err)))
-			}
-
 			//package path
 			path := "all" //local all packages
 			if len(args) > 0 {
@@ -49,40 +40,32 @@ func newPackageCmd(ui *rwi.RWI) *cobra.Command {
 				return debugPrint(ui, errs.Wrap(
 					err,
 					errs.WithContext("path", path),
-					errs.WithContext("includeInternal", includeInternal),
-					errs.WithContext("includeStd", includeStd),
 				))
 			}
-			ds := dependency.NewPackages(ps, includeStd, includeInternal)
+			ds := dependency.NewModules(modules.ImportModules(ps))
 			if dotFlag {
-				s, err := pkgjson.EncodeDot(ds, dotConfFile)
+				s, err := modjson.EncodeDot(ds, dotConfFile)
 				if err != nil {
 					return debugPrint(ui, errs.Wrap(
 						err,
 						errs.WithContext("path", path),
-						errs.WithContext("includeInternal", includeInternal),
-						errs.WithContext("includeStd", includeStd),
 					))
 				}
 				return ui.Outputln(s)
 			} else {
-				b, err := pkgjson.Encode(ds)
+				b, err := modjson.Encode(ds)
 				if err != nil {
 					return debugPrint(ui, errs.Wrap(
 						err,
 						errs.WithContext("path", path),
-						errs.WithContext("includeInternal", includeInternal),
-						errs.WithContext("includeStd", includeStd),
 					))
 				}
 				return ui.OutputBytes(b)
 			}
 		},
 	}
-	packageCmd.Flags().BoolP("include-internal", "i", false, "include internal packages")
-	packageCmd.Flags().BoolP("include-standard", "s", false, "include standard Go library")
 
-	return packageCmd
+	return moduleCmd
 }
 
 /* Copyright 2020 Spiegel

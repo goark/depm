@@ -33,6 +33,21 @@ func ImportPackages(ctx context.Context, name string, opts ...golist.OptEnv) (*P
 	return ps, nil
 }
 
+func importPackages(plist []golist.Package) *Packages {
+	ps := &Packages{list: []*Package{}}
+	for i := 0; i < len(plist); i++ {
+		ps.Add(&plist[i])
+		for _, s := range plist[i].Imports {
+			p := ps.Get(s)
+			if p == nil {
+				p = ps.Set(newPackageName(s))
+			}
+			p.Root = false
+		}
+	}
+	return ps
+}
+
 /* Copyright 2020 Spiegel
  *
  * Licensed under the Apache License, Version 2.0 (the "License");

@@ -74,21 +74,6 @@ type Packages struct {
 	list []*Package
 }
 
-func importPackages(plist []golist.Package) *Packages {
-	ps := &Packages{list: []*Package{}}
-	for i := 0; i < len(plist); i++ {
-		ps.Add(&plist[i])
-		for _, s := range plist[i].Imports {
-			p := ps.Get(s)
-			if p == nil {
-				p = ps.Set(newPackageName(s))
-			}
-			p.Root = false
-		}
-	}
-	return ps
-}
-
 //Set method sets Package instance in Packages.
 func (ps *Packages) Set(p *Package) *Package {
 	for i := 0; i < len(ps.list); i++ {
@@ -123,11 +108,6 @@ func (ps *Packages) Get(path string) *Package {
 func (ps *Packages) List() []*Package {
 	return ps.list
 }
-
-// //AddName method adds Package instance (Path element only) in Packages.
-// func (ps *Packages) AddName(name string) {
-// 	ps.Set(newPackageName(name))
-// }
 
 //Add method adds Package instance in Packages.
 func (ps *Packages) Add(p *golist.Package) {

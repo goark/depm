@@ -7,6 +7,7 @@ import (
 	"github.com/spiegel-im-spiegel/errs"
 )
 
+//ImportPackages gets packages dependency information
 func ImportPackages(ctx context.Context, name string, opts ...golist.OptEnv) (*Packages, error) {
 	plist, err := golist.GetPackages(ctx, name, opts...)
 	if err != nil {

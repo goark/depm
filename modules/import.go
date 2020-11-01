@@ -1,8 +1,37 @@
 package modules
 
-import "github.com/spiegel-im-spiegel/depm/packages"
+import (
+	"context"
 
-func ImportModules(ps *packages.Packages) *Modules {
+	"github.com/spiegel-im-spiegel/depm/golist"
+	"github.com/spiegel-im-spiegel/depm/packages"
+	"github.com/spiegel-im-spiegel/errs"
+)
+
+//ImportModules gets modules dependency information
+func ImportModules(ctx context.Context, name string, updFlag bool, opts ...golist.OptEnv) (*Modules, error) {
+	ps, err := packages.ImportPackages(ctx, name, opts...)
+	if err != nil {
+		return nil, errs.Wrap(err, errs.WithContext("name", name), errs.WithContext("updFlag", updFlag))
+	}
+	ms := importModules(ps)
+	if updFlag {
+		for _, m := range ms.List() {
+			ml, err := golist.GetModules(ctx, m.Name.Path, opts...)
+			if err != nil {
+				return nil, errs.Wrap(err, errs.WithContext("path", m.Name.Path), errs.WithContext("updFlag", updFlag))
+			}
+			if upd := searchModule(m.Name, ml); upd != nil && upd.Update != nil {
+				if !m.Name.EqualAll(upd.Update.Path, upd.Update.Version) {
+					m.Update = newName(upd.Update.Path, upd.Update.Version)
+				}
+			}
+		}
+	}
+	return ms, nil
+}
+
+func importModules(ps *packages.Packages) *Modules {
 	ms := &Modules{list: []*Module{}}
 	for _, p := range ps.List() {
 		m := newModule(p.Contained)
@@ -23,6 +52,15 @@ func ImportModules(ps *packages.Packages) *Modules {
 		}
 	}
 	return ms
+}
+
+func searchModule(name Name, mlist []golist.Module) *golist.Module {
+	for _, m := range mlist {
+		if name.EqualAll(m.Path, m.Version) {
+			return &m
+		}
+	}
+	return nil
 }
 
 /* Copyright 2020 Spiegel

@@ -8,7 +8,6 @@ import (
 	"github.com/spiegel-im-spiegel/depm/dependency/modjson"
 	"github.com/spiegel-im-spiegel/depm/golist"
 	"github.com/spiegel-im-spiegel/depm/modules"
-	"github.com/spiegel-im-spiegel/depm/packages"
 	"github.com/spiegel-im-spiegel/errs"
 	"github.com/spiegel-im-spiegel/gocli/rwi"
 )
@@ -18,9 +17,15 @@ func newModuleCmd(ui *rwi.RWI) *cobra.Command {
 	moduleCmd := &cobra.Command{
 		Use:     "module [flags] [package import path]",
 		Aliases: []string{"mod", "m"},
-		Short:   "Visualize depndency modules",
-		Long:    "Visualize depndency modules.",
+		Short:   "analyze depndency modules",
+		Long:    "analyze depndency modules.",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			//Options
+			updFlag, err := cmd.Flags().GetBool("check")
+			if err != nil {
+				return debugPrint(ui, errs.New("Error in --check option", errs.WithCause(err)))
+			}
+
 			//package path
 			path := "all" //local all packages
 			if len(args) > 0 {
@@ -28,9 +33,10 @@ func newModuleCmd(ui *rwi.RWI) *cobra.Command {
 			}
 
 			//Run command
-			ps, err := packages.ImportPackages(
+			ms, err := modules.ImportModules(
 				context.Background(),
 				path,
+				updFlag,
 				golist.WithGOARCH(goarchString),
 				golist.WithGOOS(goosString),
 				golist.WithCGOENABLED(cgoenabledString),
@@ -39,15 +45,17 @@ func newModuleCmd(ui *rwi.RWI) *cobra.Command {
 			if err != nil {
 				return debugPrint(ui, errs.Wrap(
 					err,
+					errs.WithContext("updFlag", updFlag),
 					errs.WithContext("path", path),
 				))
 			}
-			ds := dependency.NewModules(modules.ImportModules(ps))
+			ds := dependency.NewModules(ms)
 			if dotFlag {
 				s, err := modjson.EncodeDot(ds, dotConfFile)
 				if err != nil {
 					return debugPrint(ui, errs.Wrap(
 						err,
+						errs.WithContext("updFlag", updFlag),
 						errs.WithContext("path", path),
 					))
 				}
@@ -57,6 +65,7 @@ func newModuleCmd(ui *rwi.RWI) *cobra.Command {
 				if err != nil {
 					return debugPrint(ui, errs.Wrap(
 						err,
+						errs.WithContext("updFlag", updFlag),
 						errs.WithContext("path", path),
 					))
 				}
@@ -64,6 +73,7 @@ func newModuleCmd(ui *rwi.RWI) *cobra.Command {
 			}
 		},
 	}
+	moduleCmd.Flags().BoolP("check", "c", false, "check updating module")
 
 	return moduleCmd
 }

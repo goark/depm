@@ -76,6 +76,7 @@ func GetPackagesRaw(ctx context.Context, name string, opts ...OptEnv) ([]byte, e
 	return b, errs.Wrap(err, errs.WithContext("name", name))
 }
 
+//GetPackages returns package information
 func GetPackages(ctx context.Context, name string, opts ...OptEnv) ([]Package, error) {
 	b, err := GetPackagesRaw(ctx, name, opts...)
 	if err != nil {
@@ -94,6 +95,37 @@ func GetPackages(ctx context.Context, name string, opts ...OptEnv) ([]Package, e
 		ps = append(ps, p)
 	}
 	return ps, nil
+}
+
+//GetModulesRaw returns module information by JSON string
+func GetModulesRaw(ctx context.Context, name string, opts ...OptEnv) ([]byte, error) {
+	cl := newCmdLine(name, opts...)
+	cmd := exec.CommandContext(ctx, "go", "list", "-json", "-m", "-u", cl.argument)
+	cmd.Env = cl.GetEnv()
+	cmd.Stderr = cl.errorWriter
+	b, err := cmd.Output()
+	return b, errs.Wrap(err, errs.WithContext("name", name))
+}
+
+//GetModules returns module information
+func GetModules(ctx context.Context, name string, opts ...OptEnv) ([]Module, error) {
+	b, err := GetModulesRaw(ctx, name, opts...)
+	if err != nil {
+		return nil, errs.Wrap(err, errs.WithContext("name", name))
+	}
+	decoder := json.NewDecoder(bytes.NewReader(b))
+	ms := []Module{}
+	for {
+		var m Module
+		if err := decoder.Decode(&m); err != nil {
+			if errs.Is(err, io.EOF) {
+				break
+			}
+			return ms, errs.Wrap(err, errs.WithContext("name", name))
+		}
+		ms = append(ms, m)
+	}
+	return ms, nil
 }
 
 /* Copyright 2020 Spiegel

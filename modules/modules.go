@@ -9,7 +9,7 @@ type Module struct {
 	Name     Name     // module name (path and version)
 	Main     bool     // is this the main module?
 	Indirect bool     // is this module only an indirect dependency of main module?
-	Update   *Module  // available update, if any (with -u)
+	Update   Name     // available update, if any (with -u)
 	Packages []string // pakcages in this module
 	Deps     []Name   // dependency module names
 }
@@ -22,12 +22,12 @@ func newModule(m *golist.Module) *Module {
 		Name:     newName(m.Path, m.Version),
 		Main:     m.Main,
 		Indirect: m.Indirect,
-		Update:   nil,
+		Update:   Name{},
 		Packages: []string{},
 		Deps:     []Name{},
 	}
 	if m.Update != nil {
-		mm.Update = newModule(m.Update)
+		mm.Update = newName(m.Update.Path, m.Update.Version)
 	}
 	return mm
 }

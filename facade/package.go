@@ -17,8 +17,8 @@ func newPackageCmd(ui *rwi.RWI) *cobra.Command {
 	packageCmd := &cobra.Command{
 		Use:     "package [flags] [package import path]",
 		Aliases: []string{"pkg", "p"},
-		Short:   "Visualize depndency packages",
-		Long:    "Visualize depndency packages.",
+		Short:   "analyze depndency packages",
+		Long:    "analyze depndency packages.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			//Options
 			includeInternal, err := cmd.Flags().GetBool("include-internal")

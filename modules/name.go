@@ -29,6 +29,11 @@ func (left Name) Equal(right Name) bool {
 	return left.EqualAll(right.Path, right.Version)
 }
 
+//Equal method returns true if left == right
+func (nm Name) IsZero() bool {
+	return len(nm.Path) == 0
+}
+
 /* Copyright 2020 Spiegel
  *
  * Licensed under the Apache License, Version 2.0 (the "License");

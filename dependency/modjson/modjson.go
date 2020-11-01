@@ -2,6 +2,7 @@ package modjson
 
 import (
 	"encoding/json"
+	"fmt"
 	"sort"
 
 	"github.com/spiegel-im-spiegel/depm/dependency"
@@ -16,14 +17,26 @@ type edgeJSON struct {
 }
 type nodeJSON struct {
 	Path     string
-	Packages []string `json:",omitempty"`
 	Main     bool     `json:",omitempty"`
+	Latest   string   `json:",omitempty"`
+	Packages []string `json:",omitempty"`
+}
+
+func (nj *nodeJSON) label() string {
+	name := nj.Path
+	if len(nj.Latest) > 0 {
+		name = fmt.Sprintf("%s (latest %s)", name, nj.Latest)
+	}
+	return name
 }
 
 func newNodeJSON(mod *modules.Module) *nodeJSON {
 	node := &nodeJSON{
 		Path: mod.Name.String(),
 		Main: mod.Main,
+	}
+	if !mod.Update.IsZero() {
+		node.Latest = mod.Update.Version
 	}
 	if len(mod.Packages) > 0 {
 		node.Packages = make([]string, len(mod.Packages), cap(mod.Packages))
@@ -58,7 +71,7 @@ func EncodeDot(deps []*dependency.EdgeModule, conf string) (string, error) {
 	ds := []*dotenc.Dep{}
 	for _, ej := range ejs {
 		for _, d := range ej.Deps {
-			ds = append(ds, dotenc.NewDep(ej.Module.Path, d.Path))
+			ds = append(ds, dotenc.NewDep(ej.Module.label(), d.label()))
 		}
 	}
 	dot, err := dotenc.New(conf)

@@ -44,7 +44,7 @@ Flags:
 Use "depm [command] --help" for more information about a command.
 ```
 
-### Analyze depndency packages
+### Analyze Depndency Packages
 
 ```
 $ depm package -h
@@ -94,7 +94,7 @@ $ depm package "github.com/spiegel-im-spiegel/depm" | jq .
 ...
 ```
 
-### Analyze depndency packages
+### Analyze Depndency Modules
 
 ```
 $ depm module -h

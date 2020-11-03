@@ -5,8 +5,8 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/spiegel-im-spiegel/depm/dependency"
-	"github.com/spiegel-im-spiegel/depm/dependency/modjson"
 	"github.com/spiegel-im-spiegel/depm/golist"
+	"github.com/spiegel-im-spiegel/depm/jsons/modjson"
 	"github.com/spiegel-im-spiegel/depm/modules"
 	"github.com/spiegel-im-spiegel/errs"
 	"github.com/spiegel-im-spiegel/gocli/rwi"

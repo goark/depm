@@ -139,7 +139,6 @@ $ depm module "github.com/spiegel-im-spiegel/depm" | jq .
   ...
 ```
 
-
 ### Output DOT Language Format with Configuration File
 
 ```toml

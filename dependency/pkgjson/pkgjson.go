@@ -5,39 +5,44 @@ import (
 
 	"github.com/spiegel-im-spiegel/depm/dependency"
 	"github.com/spiegel-im-spiegel/depm/dotenc"
+	"github.com/spiegel-im-spiegel/depm/golist"
+	"github.com/spiegel-im-spiegel/depm/packages"
 	"github.com/spiegel-im-spiegel/errs"
 )
 
-type edgeJSON struct {
-	Package packageJSON
-	Deps    []*nodeJSON `json:",omitempty"`
-}
-type packageJSON struct {
-	ImportPath string
-	Root       bool        `json:",omitempty"`
-	Module     *moduleJSON `json:",omitempty"`
-}
-type moduleJSON struct {
-	Path    string
-	Version string
-}
 type nodeJSON struct {
-	Package    packageJSON
+	Package *packageJSON
+	Deps    []*edgeJSON `json:",omitempty"`
+}
+type edgeJSON struct {
+	Package    *packageJSON
 	IsUnsafe   bool `json:",omitempty"`
 	IsInternal bool `json:",omitempty"`
 }
-
-//EncodeJSON returns JSON formatted text from Node slice.
-func Encode(deps []*dependency.EdgePackage) ([]byte, error) {
-	return json.Marshal(newEdgeJSON(deps))
+type packageJSON struct {
+	ImportPath string
+	Module     *moduleJSON `json:",omitempty"`
+}
+type moduleJSON struct {
+	Path    string `json:",omitempty"`
+	Version string `json:",omitempty"`
 }
 
-func EncodeDot(deps []*dependency.EdgePackage, conf string) (string, error) {
-	ejs := newEdgeJSON(deps)
+//EncodeJSON returns JSON formatted text from Node slice.
+func Encode(deps []*dependency.NodePackage) ([]byte, error) {
+	return json.Marshal(newNodeJSON(deps))
+}
+
+func EncodeDot(deps []*dependency.NodePackage, conf string) (string, error) {
+	ejs := newNodeJSON(deps)
 	ds := []*dotenc.Dep{}
 	for _, ej := range ejs {
-		for _, d := range ej.Deps {
-			ds = append(ds, dotenc.NewDep(ej.Package.ImportPath, d.Package.ImportPath))
+		if len(ej.Deps) > 0 {
+			for _, d := range ej.Deps {
+				ds = append(ds, dotenc.NewDep(ej.Package.ImportPath, d.Package.ImportPath))
+			}
+		} else {
+			ds = append(ds, dotenc.NewDep(ej.Package.ImportPath, ""))
 		}
 	}
 	dot, err := dotenc.New(conf)
@@ -47,17 +52,25 @@ func EncodeDot(deps []*dependency.EdgePackage, conf string) (string, error) {
 	return dot.ImportDeps(ds...).String(), nil
 }
 
-func newEdgeJSON(deps []*dependency.EdgePackage) []edgeJSON {
-	nj := []edgeJSON{}
+func newPackageJSON(p *packages.Package) *packageJSON {
+	return &packageJSON{ImportPath: p.Path}
+}
+
+func newModuleJSON(m *golist.Module) *moduleJSON {
+	return &moduleJSON{Path: m.Path, Version: m.Version}
+}
+
+func newNodeJSON(deps []*dependency.NodePackage) []nodeJSON {
+	nj := []nodeJSON{}
 	for _, n := range deps {
-		nd := edgeJSON{Package: packageJSON{ImportPath: n.Package.Path, Root: n.Package.Root}, Deps: []*nodeJSON{}}
+		nd := nodeJSON{Package: newPackageJSON(n.Package), Deps: []*edgeJSON{}}
 		if mod := n.Package.Contained; mod != nil {
-			nd.Package.Module = &moduleJSON{Path: mod.Path, Version: mod.Version}
+			nd.Package.Module = newModuleJSON(mod)
 		}
 		for _, p := range n.Deps {
-			edge := &nodeJSON{Package: packageJSON{ImportPath: p.Path, Root: p.Root}, IsUnsafe: p.IsUnsafe(), IsInternal: p.IsInternal()}
+			edge := &edgeJSON{Package: newPackageJSON(p), IsUnsafe: p.IsUnsafe(), IsInternal: p.IsInternal()}
 			if mod := p.Contained; mod != nil {
-				edge.Package.Module = &moduleJSON{Path: mod.Path, Version: mod.Version}
+				edge.Package.Module = newModuleJSON(mod)
 			}
 			nd.Deps = append(nd.Deps, edge)
 		}

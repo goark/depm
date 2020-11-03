@@ -41,9 +41,10 @@ func importPackages(plist []golist.Package) *Packages {
 		for _, s := range plist[i].Imports {
 			p := ps.Get(s)
 			if p == nil {
-				p = ps.Set(newPackageName(s))
+				ps.Set(newPackageName(s, false, true))
+			} else {
+				p.Edge = true
 			}
-			p.Root = false
 		}
 	}
 	return ps

@@ -3,8 +3,6 @@ package subproc
 import (
 	"context"
 	"io"
-	"os"
-	"os/exec"
 
 	"github.com/spiegel-im-spiegel/errs"
 )
@@ -17,6 +15,7 @@ type Cmd struct {
 	env         []string        //additional environment variables
 	reader      io.Reader       // stdin
 	errorWriter io.Writer       // stderr
+	hideWindow  bool            // HideWindow attribution
 }
 
 //New creates new Cmd instance
@@ -52,9 +51,15 @@ func (c *Cmd) WithStderr(w io.Writer) *Cmd {
 	return c
 }
 
+//HideWindow method sets HideWindow attribution flag element
+func (c *Cmd) HideWindow(enable bool) *Cmd {
+	c.hideWindow = enable
+	return c
+}
+
 //Output method runs subprocess and output result
 func (c *Cmd) Output() ([]byte, error) {
-	path, err := LookPath(c.name)
+	cmd, err := c.newExecCmd()
 	if err != nil {
 		return nil, errs.Wrap(
 			err,
@@ -63,26 +68,10 @@ func (c *Cmd) Output() ([]byte, error) {
 			errs.WithContext("env", c.env),
 		)
 	}
-	var cmd *exec.Cmd
-	if c.ctx != nil {
-		cmd = exec.CommandContext(c.ctx, path, c.args...)
-	} else {
-		cmd = exec.Command(path, c.args...)
-	}
-	if c.reader != nil {
-		cmd.Stdin = c.reader
-	}
-	if c.errorWriter != nil {
-		cmd.Stderr = c.errorWriter
-	}
-	if len(c.env) > 0 {
-		cmd.Env = append(os.Environ(), c.env...)
-	}
 	b, err := cmd.Output()
 	return b, errs.Wrap(
 		err,
 		errs.WithContext("name", c.name),
-		errs.WithContext("path", path),
 		errs.WithContext("args", c.args),
 		errs.WithContext("env", c.env),
 	)

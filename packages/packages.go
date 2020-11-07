@@ -20,6 +20,7 @@ type Package struct {
 	DepOnly    bool           // package is only a dependency, not explicitly listed
 	Contained  *golist.Module // info about package's containing module, if any (can be nil)
 	Imports    []string       // import paths used by this package
+	Error      error          // error loading package
 }
 
 func newPackageName(name string, node, edge bool) *Package {
@@ -38,6 +39,7 @@ func (p *Package) Copy(pp *golist.Package) *Package {
 	p.Incomplete = pp.Incomplete
 	p.DepOnly = pp.DepOnly
 	p.Contained = pp.Module
+	p.Error = pp.GetError()
 	if len(pp.Imports) > 0 {
 		p.Imports = make([]string, len(pp.Imports), cap(pp.Imports))
 		copy(p.Imports, pp.Imports)
@@ -47,7 +49,7 @@ func (p *Package) Copy(pp *golist.Package) *Package {
 
 //Valid returns true if is not Incomplete
 func (p *Package) Valid() bool {
-	return p != nil && !p.Incomplete
+	return p != nil && !p.Incomplete && p.Error == nil
 }
 
 //Equal returns true if left == right

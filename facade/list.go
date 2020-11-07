@@ -4,30 +4,25 @@ import (
 	"context"
 
 	"github.com/spf13/cobra"
-	"github.com/spiegel-im-spiegel/depm/dependency"
-	"github.com/spiegel-im-spiegel/depm/facade/modjson"
+	"github.com/spiegel-im-spiegel/depm/facade/lstjson"
 	"github.com/spiegel-im-spiegel/depm/golist"
-	"github.com/spiegel-im-spiegel/depm/modules"
+	"github.com/spiegel-im-spiegel/depm/list"
 	"github.com/spiegel-im-spiegel/errs"
 	"github.com/spiegel-im-spiegel/gocli/rwi"
 )
 
 //newModuleCmd returns cobra.Command instance for show sub-command
-func newModuleCmd(ui *rwi.RWI) *cobra.Command {
-	moduleCmd := &cobra.Command{
-		Use:     "module [flags] [package import path]",
-		Aliases: []string{"mod", "m"},
-		Short:   "analyze depndency modules",
-		Long:    "analyze depndency modules.",
+func newListCmd(ui *rwi.RWI) *cobra.Command {
+	listCmd := &cobra.Command{
+		Use:     "list [flags] [package import path]",
+		Aliases: []string{"lst", "l"},
+		Short:   "list modules",
+		Long:    "list modules, compatible 'go list -m' command",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			//Options
-			dotFlag, err := cmd.Flags().GetBool("dot")
+			jsonFlag, err := cmd.Flags().GetBool("json")
 			if err != nil {
-				return debugPrint(ui, errs.New("Error in --dot option", errs.WithCause(err)))
-			}
-			dotConfFile, err := cmd.Flags().GetString("dot-config")
-			if err != nil {
-				return debugPrint(ui, errs.New("Error in --dot-config option", errs.WithCause(err)))
+				return debugPrint(ui, errs.New("Error in --json option", errs.WithCause(err)))
 			}
 			updFlag, err := cmd.Flags().GetBool("check-update")
 			if err != nil {
@@ -41,7 +36,7 @@ func newModuleCmd(ui *rwi.RWI) *cobra.Command {
 			}
 
 			//Run command
-			ms, err := modules.ImportModules(
+			ms, err := list.ImportModules(
 				context.Background(),
 				path,
 				updFlag,
@@ -53,34 +48,30 @@ func newModuleCmd(ui *rwi.RWI) *cobra.Command {
 			if err != nil {
 				return debugPrint(ui, errs.Wrap(
 					err,
-					errs.WithContext("dotFlag", dotFlag),
-					errs.WithContext("dotConfFile", dotConfFile),
+					errs.WithContext("jsonFlag", jsonFlag),
 					errs.WithContext("updFlag", updFlag),
 					errs.WithContext("path", path),
 				))
 			}
-			ds := dependency.NewModules(ms)
 
 			//Output
-			if dotFlag {
-				s, err := modjson.EncodeDot(ds, dotConfFile)
+			if jsonFlag {
+				b, err := lstjson.Encode(ms)
 				if err != nil {
 					return debugPrint(ui, errs.Wrap(
 						err,
-						errs.WithContext("dotFlag", dotFlag),
-						errs.WithContext("dotConfFile", dotConfFile),
+						errs.WithContext("jsonFlag", jsonFlag),
 						errs.WithContext("updFlag", updFlag),
 						errs.WithContext("path", path),
 					))
 				}
-				return ui.Outputln(s)
+				return ui.OutputBytes(b)
 			} else {
-				b, err := modjson.Encode(ds)
+				b, err := lstjson.EncodeText(ms)
 				if err != nil {
 					return debugPrint(ui, errs.Wrap(
 						err,
-						errs.WithContext("dotFlag", dotFlag),
-						errs.WithContext("dotConfFile", dotConfFile),
+						errs.WithContext("jsonFlag", jsonFlag),
 						errs.WithContext("updFlag", updFlag),
 						errs.WithContext("path", path),
 					))
@@ -89,11 +80,10 @@ func newModuleCmd(ui *rwi.RWI) *cobra.Command {
 			}
 		},
 	}
-	moduleCmd.Flags().BoolP("dot", "", false, "output by DOT language")
-	moduleCmd.Flags().StringP("dot-config", "", "", "config file for DOT language")
-	moduleCmd.Flags().BoolP("check-update", "u", false, "check updating module")
+	listCmd.Flags().BoolP("json", "j", false, "output by JSON format")
+	listCmd.Flags().BoolP("check-update", "u", false, "check updating module")
 
-	return moduleCmd
+	return listCmd
 }
 
 /* Copyright 2020 Spiegel

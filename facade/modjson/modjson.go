@@ -61,11 +61,12 @@ func newNodeJSON(deps []*dependency.NodeModule) []nodeJSON {
 	return nj
 }
 
-//EncodeJSON returns JSON formatted text from Node slice.
+//Encode returns JSON formatted text from Node slice.
 func Encode(deps []*dependency.NodeModule) ([]byte, error) {
 	return json.Marshal(newNodeJSON(deps))
 }
 
+//EncodeDot returns DOT lnguage formatted text from Node slice.
 func EncodeDot(deps []*dependency.NodeModule, conf string) (string, error) {
 	ejs := newNodeJSON(deps)
 	ds := []*dotenc.Dep{}

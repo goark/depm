@@ -18,8 +18,6 @@ var (
 )
 var (
 	debugFlag        bool   //debug flag
-	dotFlag          bool   //output by DOT language
-	dotConfFile      string //config file for DOT language
 	goarchString     string //goarch flag
 	goosString       string //goos flag
 	cgoenabledString string //cgo-enabled flag
@@ -44,12 +42,11 @@ func newRootCmd(ui *rwi.RWI, args []string) *cobra.Command {
 		newVersionCmd(ui),
 		newPackageCmd(ui),
 		newModuleCmd(ui),
+		newListCmd(ui),
 	)
 
 	//global options
 	rootCmd.PersistentFlags().BoolVarP(&debugFlag, "debug", "", false, "for debug")
-	rootCmd.PersistentFlags().BoolVarP(&dotFlag, "dot", "", false, "output by DOT language")
-	rootCmd.PersistentFlags().StringVarP(&dotConfFile, "dot-config", "", "", "config file for DOT language")
 	rootCmd.PersistentFlags().StringVarP(&goarchString, "goarch", "", "", "set GOARCH environment variable")
 	rootCmd.PersistentFlags().StringVarP(&goosString, "goos", "", "", "set GOOS environment variable")
 	rootCmd.PersistentFlags().StringVarP(&cgoenabledString, "cgo-enabled", "", "", "set CGO_ENABLED environment variable")

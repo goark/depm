@@ -15,6 +15,7 @@ type Module struct {
 	Update   Name     // available update, if any (with -u)
 	Packages []string // pakcages in this module
 	Deps     []Name   // dependency module names
+	Error    error    // error loading module
 }
 
 func newModule(m *golist.Module, node, edge bool) *Module {
@@ -31,6 +32,7 @@ func newModule(m *golist.Module, node, edge bool) *Module {
 		Update:   Name{},
 		Packages: []string{},
 		Deps:     []Name{},
+		Error:    m.GetError(),
 	}
 	if m.Replace != nil {
 		mm.Replace = newName(m.Replace.Path, m.Replace.Version)
@@ -43,7 +45,7 @@ func newModule(m *golist.Module, node, edge bool) *Module {
 
 //Valid returns true if is not Incomplete
 func (m *Module) Valid() bool {
-	return m != nil
+	return m != nil && m.Error == nil
 }
 
 //Equal returns true if left == right

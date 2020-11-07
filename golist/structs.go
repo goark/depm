@@ -61,10 +61,25 @@ type Package struct {
 	DepsErrors []*PackageError `json:",omitempty"` // errors loading dependencies
 }
 
+func (p *Package) GetError() error {
+	if p == nil || p.Error == nil {
+		return nil
+	}
+	return p.Error
+}
+
 type PackageError struct {
 	ImportStack []string // shortest path from package named on command line to this one
 	Pos         string   // position of error (if present, file:line:col)
 	Err         string   // the error itself
+}
+
+func (e *PackageError) Error() string {
+	s := e.Err
+	if len(e.Pos) > 0 {
+		s += "(" + e.Pos + ")"
+	}
+	return s
 }
 
 type Module struct {
@@ -82,8 +97,22 @@ type Module struct {
 	Error     *ModuleError `json:",omitempty"` // error loading module
 }
 
-type ModuleError struct {
-	Err string // the error itself
+func (m *Module) GetError() error {
+	if m == nil || m.Error == nil {
+		return nil
+	}
+	return m.Error
+}
+
+func (m *Module) Name() string {
+	if m == nil {
+		return ""
+	}
+	s := m.Path
+	if len(m.Version) > 0 {
+		s += "@" + m.Version
+	}
+	return s
 }
 
 func (m *Module) String() string {
@@ -104,6 +133,14 @@ func (m *Module) String() string {
 		}
 	}
 	return s
+}
+
+type ModuleError struct {
+	Err string // the error itself
+}
+
+func (e *ModuleError) Error() string {
+	return e.Err
 }
 
 //See https://golang.org/cmd/go/#hdr-List_packages_or_modules

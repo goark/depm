@@ -28,11 +28,12 @@ type moduleJSON struct {
 	Version string `json:",omitempty"`
 }
 
-//EncodeJSON returns JSON formatted text from Node slice.
+//Encode returns JSON formatted text from Node slice.
 func Encode(deps []*dependency.NodePackage) ([]byte, error) {
 	return json.Marshal(newNodeJSON(deps))
 }
 
+//EncodeDot returns DOT lnguage formatted text from Node slice.
 func EncodeDot(deps []*dependency.NodePackage, conf string) (string, error) {
 	ejs := newNodeJSON(deps)
 	ds := []*dotenc.Dep{}

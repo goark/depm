@@ -7,28 +7,27 @@ import (
 )
 
 //EdgePackage is Graph of dependent packages
-type EdgeModule struct {
+type NodeModule struct {
 	Module *modules.Module
 	Deps   []*modules.Module
 }
 
-func newEdgeModule(m *modules.Module) *EdgeModule {
-	return &EdgeModule{Module: m, Deps: []*modules.Module{}}
+func newNodeModule(m *modules.Module) *NodeModule {
+	return &NodeModule{Module: m, Deps: []*modules.Module{}}
 }
 
-//NewModules creates slice if EdgeModule instances.
-func NewModules(ms *modules.Modules) []*EdgeModule {
-	nd := []*EdgeModule{}
+//NewModules creates slice if NodeModule instances.
+func NewModules(ms *modules.Modules) []*NodeModule {
+	nd := []*NodeModule{}
 	for _, m := range ms.List() {
-		if len(m.Deps) > 0 {
-			n := newEdgeModule(m)
+		if m.Valid() {
+			n := newNodeModule(m)
 			for _, nm := range m.Deps {
-				dm := ms.Get(nm)
-				if dm != nil {
+				if dm := ms.Get(nm); dm != nil {
 					n.Deps = append(n.Deps, dm)
 				}
 			}
-			if len(n.Deps) > 0 {
+			if len(n.Deps) > 0 || !m.EdgeOnly() {
 				nd = append(nd, n)
 			}
 		}

@@ -35,7 +35,13 @@ func New(conf string) (*Ctx, error) {
 //ImportDeps method makes graph data
 func (ctx *Ctx) ImportDeps(deps ...*Dep) *Ctx {
 	for _, dep := range deps {
-		ctx.addEdgeAttr(ctx.getNode(dep.From).Edge(ctx.getNode(dep.To)))
+		if len(dep.From) > 0 {
+			if len(dep.To) > 0 {
+				ctx.addEdgeAttr(ctx.getNode(dep.From).Edge(ctx.getNode(dep.To)))
+			} else {
+				ctx.getNode(dep.From)
+			}
+		}
 	}
 	return ctx
 }

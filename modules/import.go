@@ -34,18 +34,13 @@ func ImportModules(ctx context.Context, name string, updFlag bool, opts ...golis
 func importModules(ps *packages.Packages) *Modules {
 	ms := &Modules{list: []*Module{}}
 	for _, p := range ps.List() {
-		m := newModule(p.Contained)
-		if m != nil {
-			m = ms.Set(m)
+		if m := ms.Add(p.Contained); m != nil {
 			m.SetPackage(p.Path)
 			for _, path := range p.Imports {
-				dp := ps.Get(path)
-				if dp != nil {
-					dm := newModule(dp.Contained)
-					if dm != nil && !m.Equal(dm) {
+				if dp := ps.Get(path); dp != nil {
+					if dm := m.SetDep(dp.Contained); dm != nil {
 						dm = ms.Set(dm)
 						dm.SetPackage(dp.Path)
-						m.SetDeps(dm)
 					}
 				}
 			}

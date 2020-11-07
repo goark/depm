@@ -11,18 +11,18 @@ import (
 	"github.com/spiegel-im-spiegel/errs"
 )
 
-type edgeJSON struct {
-	Module *nodeJSON
-	Deps   []*nodeJSON `json:",omitempty"`
-}
 type nodeJSON struct {
+	Module *moduleJSON
+	Deps   []*moduleJSON `json:",omitempty"`
+}
+type moduleJSON struct {
 	Path     string
 	Main     bool     `json:",omitempty"`
 	Latest   string   `json:",omitempty"`
 	Packages []string `json:",omitempty"`
 }
 
-func (nj *nodeJSON) label() string {
+func (nj *moduleJSON) label() string {
 	name := nj.Path
 	if len(nj.Latest) > 0 {
 		name = fmt.Sprintf("%s (latest %s)", name, nj.Latest)
@@ -30,48 +30,53 @@ func (nj *nodeJSON) label() string {
 	return name
 }
 
-func newNodeJSON(mod *modules.Module) *nodeJSON {
-	node := &nodeJSON{
-		Path: mod.Name.String(),
-		Main: mod.Main,
+func newModuleJSON(m *modules.Module) *moduleJSON {
+	mod := &moduleJSON{
+		Path: m.Name.String(),
+		Main: m.Main,
 	}
-	if !mod.Update.IsZero() {
-		node.Latest = mod.Update.Version
+	if !m.Update.IsZero() {
+		mod.Latest = m.Update.Version
 	}
-	if len(mod.Packages) > 0 {
-		node.Packages = make([]string, len(mod.Packages), cap(mod.Packages))
-		copy(node.Packages, mod.Packages)
-		sort.SliceStable(node.Packages, func(i, j int) bool {
-			return node.Packages[i] < node.Packages[j]
+	if len(m.Packages) > 0 {
+		mod.Packages = make([]string, len(m.Packages), cap(m.Packages))
+		copy(mod.Packages, m.Packages)
+		sort.SliceStable(mod.Packages, func(i, j int) bool {
+			return mod.Packages[i] < mod.Packages[j]
 		})
 
 	}
-	return node
+	return mod
 }
 
-func newEdgeJSON(deps []*dependency.EdgeModule) []edgeJSON {
-	nj := []edgeJSON{}
+func newNodeJSON(deps []*dependency.NodeModule) []nodeJSON {
+	nj := []nodeJSON{}
 	for _, n := range deps {
-		nd := edgeJSON{Module: newNodeJSON(n.Module), Deps: []*nodeJSON{}}
+		nd := nodeJSON{Module: newModuleJSON(n.Module), Deps: []*moduleJSON{}}
 		for _, m := range n.Deps {
-			nd.Deps = append(nd.Deps, newNodeJSON(m))
+			nd.Deps = append(nd.Deps, newModuleJSON(m))
 		}
 		nj = append(nj, nd)
 	}
 	return nj
 }
 
-//EncodeJSON returns JSON formatted text from Node slice.
-func Encode(deps []*dependency.EdgeModule) ([]byte, error) {
-	return json.Marshal(newEdgeJSON(deps))
+//Encode returns JSON formatted text from Node slice.
+func Encode(deps []*dependency.NodeModule) ([]byte, error) {
+	return json.Marshal(newNodeJSON(deps))
 }
 
-func EncodeDot(deps []*dependency.EdgeModule, conf string) (string, error) {
-	ejs := newEdgeJSON(deps)
+//EncodeDot returns DOT lnguage formatted text from Node slice.
+func EncodeDot(deps []*dependency.NodeModule, conf string) (string, error) {
+	ejs := newNodeJSON(deps)
 	ds := []*dotenc.Dep{}
 	for _, ej := range ejs {
-		for _, d := range ej.Deps {
-			ds = append(ds, dotenc.NewDep(ej.Module.label(), d.label()))
+		if len(ej.Deps) > 0 {
+			for _, d := range ej.Deps {
+				ds = append(ds, dotenc.NewDep(ej.Module.label(), d.label()))
+			}
+		} else {
+			ds = append(ds, dotenc.NewDep(ej.Module.label(), ""))
 		}
 	}
 	dot, err := dotenc.New(conf)

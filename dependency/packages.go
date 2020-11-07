@@ -6,29 +6,29 @@ import (
 	"github.com/spiegel-im-spiegel/depm/packages"
 )
 
-//EdgePackage is Graph of dependent packages
-type EdgePackage struct {
+//NodePackage is Graph of dependent packages
+type NodePackage struct {
 	Package *packages.Package
 	Deps    []*packages.Package
 }
 
-func newEdgePackage(p *packages.Package) *EdgePackage {
-	return &EdgePackage{Package: p, Deps: []*packages.Package{}}
+func newNodePackage(p *packages.Package) *NodePackage {
+	return &NodePackage{Package: p, Deps: []*packages.Package{}}
 }
 
-//New creates slice if EdgePackage instances.
-func NewPackages(ps *packages.Packages, withStd bool, withInternal bool) []*EdgePackage {
-	nd := []*EdgePackage{}
+//New creates slice if NodePackage instances.
+func NewPackages(ps *packages.Packages, withStd bool, withInternal bool) []*NodePackage {
+	nd := []*NodePackage{}
 	for _, p := range ps.List() {
 		if p.Valid() && !p.IsStandard() && (!withInternal && !p.IsInternal() || withInternal) && len(p.Imports) > 0 {
-			n := newEdgePackage(p)
+			n := newNodePackage(p)
 			for _, path := range p.Imports {
 				dp := ps.Get(path)
 				if p.Valid() && (((!withStd && !dp.IsStandard()) || withStd) && (!withInternal && !dp.IsInternal() || withInternal)) {
 					n.Deps = append(n.Deps, dp)
 				}
 			}
-			if len(n.Deps) > 0 {
+			if len(n.Deps) > 0 || !p.EdgeOnly() {
 				nd = append(nd, n)
 			}
 		}

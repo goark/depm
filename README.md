@@ -19,7 +19,6 @@ See [latest release](https://github.com/spiegel-im-spiegel/depm/releases/latest)
 
 ```
 $ depm -h
-$ go run main.go -h
 Visualize depndency packages and modules.
 
 Usage:
@@ -28,6 +27,7 @@ Usage:
 
 Available Commands:
   help        Help about any command
+  list        list modules
   module      analyze depndency modules
   package     analyze depndency packages
   version     print the version number
@@ -35,8 +35,6 @@ Available Commands:
 Flags:
       --cgo-enabled string   set CGO_ENABLED environment variable
       --debug                for debug
-      --dot                  output by DOT language
-      --dot-config string    config file for DOT language
       --goarch string        set GOARCH environment variable
       --goos string          set GOOS environment variable
   -h, --help                 help for depm
@@ -57,15 +55,15 @@ Aliases:
   package, pkg, p
 
 Flags:
-  -h, --help               help for package
-  -i, --include-internal   include internal packages
-  -s, --include-standard   include standard Go library
+      --dot                 output by DOT language
+      --dot-config string   config file for DOT language
+  -h, --help                help for package
+  -i, --include-internal    include internal packages
+  -s, --include-standard    include standard Go library
 
 Global Flags:
       --cgo-enabled string   set CGO_ENABLED environment variable
       --debug                for debug
-      --dot                  output by DOT language
-      --dot-config string    config file for DOT language
       --goarch string        set GOARCH environment variable
       --goos string          set GOOS environment variable
 
@@ -107,14 +105,14 @@ Aliases:
   module, mod, m
 
 Flags:
-  -c, --check   check updating module
-  -h, --help    help for module
+  -u, --check-update        check updating module
+      --dot                 output by DOT language
+      --dot-config string   config file for DOT language
+  -h, --help                help for module
 
 Global Flags:
       --cgo-enabled string   set CGO_ENABLED environment variable
       --debug                for debug
-      --dot                  output by DOT language
-      --dot-config string    config file for DOT language
       --goarch string        set GOARCH environment variable
       --goos string          set GOOS environment variable
 
@@ -139,7 +137,6 @@ $ depm module "github.com/spiegel-im-spiegel/depm" | jq .
   ...
 ```
 
-
 ### Output DOT Language Format with Configuration File
 
 ```toml
@@ -155,5 +152,41 @@ $ depm module --dot --dot-config dotenc/sample.toml "github.com/spiegel-im-spieg
 
 [![output.png](./output.png)](./output.png)
 
+### Output List of Modules (compatible 'go list -m' command)
+
+```
+$ depm list -h
+list modules, compatible 'go list -m' command
+
+Usage:
+  depm list [flags] [package import path]
+
+Aliases:
+  list, lst, l
+
+Flags:
+  -u, --check-update   check updating module
+  -h, --help           help for list
+  -j, --json           output by JSON format
+
+Global Flags:
+      --cgo-enabled string   set CGO_ENABLED environment variable
+      --debug                for debug
+      --goarch string        set GOARCH environment variable
+      --goos string          set GOOS environment variable
+
+$ depm list -u "github.com/spiegel-im-spiegel/depm"
+github.com/spiegel-im-spiegel/gocli v0.10.3
+github.com/spf13/cobra v1.1.1
+golang.org/x/tools v0.0.0-20201105220310-78b158585360
+github.com/emicklei/dot v0.15.0
+golang.org/x/net v0.0.0-20201021035429-f5854403a974 [v0.0.0-20201031054903-ff519b6c9102]
+golang.org/x/mod v0.3.0
+golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1
+github.com/spiegel-im-spiegel/depm
+github.com/spiegel-im-spiegel/errs v1.0.2
+github.com/spf13/pflag v1.0.5
+github.com/BurntSushi/toml v0.3.1
+```
 
 [depm]: https://github.com/spiegel-im-spiegel/depm "spiegel-im-spiegel/depm: Visualize depndency packages and modules"

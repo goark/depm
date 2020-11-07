@@ -2,14 +2,16 @@ package facade
 
 import (
 	"context"
+	"os"
 
 	"github.com/spf13/cobra"
 	"github.com/spiegel-im-spiegel/depm/dependency"
-	"github.com/spiegel-im-spiegel/depm/dependency/pkgjson"
+	"github.com/spiegel-im-spiegel/depm/facade/pkgjson"
 	"github.com/spiegel-im-spiegel/depm/golist"
 	"github.com/spiegel-im-spiegel/depm/packages"
 	"github.com/spiegel-im-spiegel/errs"
 	"github.com/spiegel-im-spiegel/gocli/rwi"
+	"github.com/spiegel-im-spiegel/gocli/signal"
 )
 
 //newPackageCmd returns cobra.Command instance for show sub-command
@@ -21,6 +23,14 @@ func newPackageCmd(ui *rwi.RWI) *cobra.Command {
 		Long:    "analyze depndency packages.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			//Options
+			dotFlag, err := cmd.Flags().GetBool("dot")
+			if err != nil {
+				return debugPrint(ui, errs.New("Error in --dot option", errs.WithCause(err)))
+			}
+			dotConfFile, err := cmd.Flags().GetString("dot-config")
+			if err != nil {
+				return debugPrint(ui, errs.New("Error in --dot-config option", errs.WithCause(err)))
+			}
 			includeInternal, err := cmd.Flags().GetBool("include-internal")
 			if err != nil {
 				return debugPrint(ui, errs.New("Error in --include-internal option", errs.WithCause(err)))
@@ -38,7 +48,7 @@ func newPackageCmd(ui *rwi.RWI) *cobra.Command {
 
 			//Run command
 			ps, err := packages.ImportPackages(
-				context.Background(),
+				signal.Context(context.Background(), os.Interrupt),
 				path,
 				golist.WithGOARCH(goarchString),
 				golist.WithGOOS(goosString),
@@ -49,17 +59,23 @@ func newPackageCmd(ui *rwi.RWI) *cobra.Command {
 				return debugPrint(ui, errs.Wrap(
 					err,
 					errs.WithContext("path", path),
+					errs.WithContext("dotFlag", dotFlag),
+					errs.WithContext("dotConfFile", dotConfFile),
 					errs.WithContext("includeInternal", includeInternal),
 					errs.WithContext("includeStd", includeStd),
 				))
 			}
 			ds := dependency.NewPackages(ps, includeStd, includeInternal)
+
+			//Output
 			if dotFlag {
 				s, err := pkgjson.EncodeDot(ds, dotConfFile)
 				if err != nil {
 					return debugPrint(ui, errs.Wrap(
 						err,
 						errs.WithContext("path", path),
+						errs.WithContext("dotFlag", dotFlag),
+						errs.WithContext("dotConfFile", dotConfFile),
 						errs.WithContext("includeInternal", includeInternal),
 						errs.WithContext("includeStd", includeStd),
 					))
@@ -71,6 +87,8 @@ func newPackageCmd(ui *rwi.RWI) *cobra.Command {
 					return debugPrint(ui, errs.Wrap(
 						err,
 						errs.WithContext("path", path),
+						errs.WithContext("dotFlag", dotFlag),
+						errs.WithContext("dotConfFile", dotConfFile),
 						errs.WithContext("includeInternal", includeInternal),
 						errs.WithContext("includeStd", includeStd),
 					))
@@ -79,6 +97,8 @@ func newPackageCmd(ui *rwi.RWI) *cobra.Command {
 			}
 		},
 	}
+	packageCmd.Flags().BoolP("dot", "", false, "output by DOT language")
+	packageCmd.Flags().StringP("dot-config", "", "", "config file for DOT language")
 	packageCmd.Flags().BoolP("include-internal", "i", false, "include internal packages")
 	packageCmd.Flags().BoolP("include-standard", "s", false, "include standard Go library")
 

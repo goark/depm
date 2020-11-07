@@ -72,6 +72,7 @@ func GetPackagesRaw(ctx context.Context, name string, opts ...OptEnv) ([]byte, e
 		WithContext(ctx).
 		AddEnv(cl.GetEnv()...).
 		WithStderr(cl.errorWriter).
+		HideWindow(true). //Windows only
 		Output()
 	return b, errs.Wrap(err, errs.WithContext("name", name))
 }
@@ -104,6 +105,7 @@ func GetModulesRaw(ctx context.Context, name string, opts ...OptEnv) ([]byte, er
 		WithContext(ctx).
 		AddEnv(cl.GetEnv()...).
 		WithStderr(cl.errorWriter).
+		HideWindow(true). //Windows only
 		Output()
 	return b, errs.Wrap(err, errs.WithContext("name", name))
 }

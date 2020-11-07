@@ -2,6 +2,7 @@ package list
 
 import (
 	"context"
+	"sort"
 
 	"github.com/spiegel-im-spiegel/depm/golist"
 	"github.com/spiegel-im-spiegel/depm/packages"
@@ -29,7 +30,11 @@ func ImportModules(ctx context.Context, name string, updFlag bool, opts ...golis
 			}
 		}
 	}
-	return ms.List(), nil
+	list := ms.List()
+	sort.SliceStable(list, func(i, j int) bool {
+		return list[i].Name() < list[j].Name()
+	})
+	return list, nil
 }
 
 func searchModule(m *golist.Module, mlist []golist.Module) *golist.Module {

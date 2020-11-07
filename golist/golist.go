@@ -6,10 +6,9 @@ import (
 	"encoding/json"
 	"io"
 	"io/ioutil"
-	"os"
-	"os/exec"
 	"runtime"
 
+	"github.com/spiegel-im-spiegel/depm/subproc"
 	"github.com/spiegel-im-spiegel/errs"
 )
 
@@ -33,7 +32,7 @@ func newCmdLine(arg string, opts ...OptEnv) *cmdLine {
 }
 
 func (cl *cmdLine) GetEnv() []string {
-	e := os.Environ()
+	e := []string{}
 	if len(cl.optGOARCH) > 0 {
 		e = append(e, "GOARCH="+cl.optGOARCH)
 	}
@@ -69,10 +68,11 @@ func WithErrorWriter(w io.Writer) OptEnv {
 //GetPackagesRaw returns package information by JSON string
 func GetPackagesRaw(ctx context.Context, name string, opts ...OptEnv) ([]byte, error) {
 	cl := newCmdLine(name, opts...)
-	cmd := exec.CommandContext(ctx, "go", "list", "-json", cl.argument)
-	cmd.Env = cl.GetEnv()
-	cmd.Stderr = cl.errorWriter
-	b, err := cmd.Output()
+	b, err := subproc.New("go", "list", "-json", cl.argument).
+		WithContext(ctx).
+		AddEnv(cl.GetEnv()...).
+		WithStderr(cl.errorWriter).
+		Output()
 	return b, errs.Wrap(err, errs.WithContext("name", name))
 }
 
@@ -100,10 +100,11 @@ func GetPackages(ctx context.Context, name string, opts ...OptEnv) ([]Package, e
 //GetModulesRaw returns module information by JSON string
 func GetModulesRaw(ctx context.Context, name string, opts ...OptEnv) ([]byte, error) {
 	cl := newCmdLine(name, opts...)
-	cmd := exec.CommandContext(ctx, "go", "list", "-json", "-m", "-u", cl.argument)
-	cmd.Env = cl.GetEnv()
-	cmd.Stderr = cl.errorWriter
-	b, err := cmd.Output()
+	b, err := subproc.New("go", "list", "-json", "-m", "-u", cl.argument).
+		WithContext(ctx).
+		AddEnv(cl.GetEnv()...).
+		WithStderr(cl.errorWriter).
+		Output()
 	return b, errs.Wrap(err, errs.WithContext("name", name))
 }
 

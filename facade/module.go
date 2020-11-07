@@ -2,6 +2,7 @@ package facade
 
 import (
 	"context"
+	"os"
 
 	"github.com/spf13/cobra"
 	"github.com/spiegel-im-spiegel/depm/dependency"
@@ -10,6 +11,7 @@ import (
 	"github.com/spiegel-im-spiegel/depm/modules"
 	"github.com/spiegel-im-spiegel/errs"
 	"github.com/spiegel-im-spiegel/gocli/rwi"
+	"github.com/spiegel-im-spiegel/gocli/signal"
 )
 
 //newModuleCmd returns cobra.Command instance for show sub-command
@@ -42,7 +44,7 @@ func newModuleCmd(ui *rwi.RWI) *cobra.Command {
 
 			//Run command
 			ms, err := modules.ImportModules(
-				context.Background(),
+				signal.Context(context.Background(), os.Interrupt),
 				path,
 				updFlag,
 				golist.WithGOARCH(goarchString),

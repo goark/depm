@@ -12,15 +12,13 @@ import (
 
 type nodeJSON struct {
 	Package *packageJSON
-	Deps    []*edgeJSON `json:",omitempty"`
-}
-type edgeJSON struct {
-	Package    *packageJSON
-	IsUnsafe   bool `json:",omitempty"`
-	IsInternal bool `json:",omitempty"`
+	Deps    []*packageJSON `json:",omitempty"`
 }
 type packageJSON struct {
 	ImportPath string
+	Internal   bool        `json:",omitempty"`
+	CGO        bool        `json:",omitempty"`
+	Unsafe     bool        `json:",omitempty"`
 	Module     *moduleJSON `json:",omitempty"`
 }
 type moduleJSON struct {
@@ -40,7 +38,7 @@ func EncodeDot(deps []*dependency.NodePackage, conf string) (string, error) {
 	for _, ej := range ejs {
 		if len(ej.Deps) > 0 {
 			for _, d := range ej.Deps {
-				ds = append(ds, dotenc.NewDep(ej.Package.ImportPath, d.Package.ImportPath))
+				ds = append(ds, dotenc.NewDep(ej.Package.ImportPath, d.ImportPath))
 			}
 		} else {
 			ds = append(ds, dotenc.NewDep(ej.Package.ImportPath, ""))
@@ -53,31 +51,31 @@ func EncodeDot(deps []*dependency.NodePackage, conf string) (string, error) {
 	return dot.ImportDeps(ds...).String(), nil
 }
 
-func newPackageJSON(p *packages.Package) *packageJSON {
-	return &packageJSON{ImportPath: p.Path}
-}
-
-func newModuleJSON(m *golist.Module) *moduleJSON {
-	return &moduleJSON{Path: m.Path, Version: m.Version}
-}
-
 func newNodeJSON(deps []*dependency.NodePackage) []nodeJSON {
 	nj := []nodeJSON{}
 	for _, n := range deps {
-		nd := nodeJSON{Package: newPackageJSON(n.Package), Deps: []*edgeJSON{}}
+		nd := nodeJSON{Package: newPackageJSON(n.Package), Deps: []*packageJSON{}}
 		if mod := n.Package.Contained; mod != nil {
 			nd.Package.Module = newModuleJSON(mod)
 		}
 		for _, p := range n.Deps {
-			edge := &edgeJSON{Package: newPackageJSON(p), IsUnsafe: p.IsUnsafe(), IsInternal: p.IsInternal()}
+			edge := newPackageJSON(p)
 			if mod := p.Contained; mod != nil {
-				edge.Package.Module = newModuleJSON(mod)
+				edge.Module = newModuleJSON(mod)
 			}
 			nd.Deps = append(nd.Deps, edge)
 		}
 		nj = append(nj, nd)
 	}
 	return nj
+}
+
+func newPackageJSON(p *packages.Package) *packageJSON {
+	return &packageJSON{ImportPath: p.Path, Internal: p.IsInternal(), CGO: p.UseCGO, Unsafe: p.UseUnsafe}
+}
+
+func newModuleJSON(m *golist.Module) *moduleJSON {
+	return &moduleJSON{Path: m.Path, Version: m.Version}
 }
 
 /* Copyright 2020 Spiegel

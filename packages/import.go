@@ -8,8 +8,8 @@ import (
 )
 
 //ImportPackages gets packages dependency information
-func ImportPackages(ctx context.Context, name string, opts ...golist.OptEnv) (*Packages, error) {
-	plist, err := golist.GetPackages(ctx, name, opts...)
+func ImportPackages(ctx context.Context, gctx golist.Context, name string) (*Packages, error) {
+	plist, err := gctx.GetPackages(ctx, name)
 	if err != nil {
 		return nil, errs.Wrap(err, errs.WithContext("name", name))
 	}
@@ -18,7 +18,7 @@ func ImportPackages(ctx context.Context, name string, opts ...golist.OptEnv) (*P
 		done := true
 		for _, p := range ps.List() {
 			if !p.Detail && p.Path != "C" {
-				plist, err := golist.GetPackages(ctx, p.Path, opts...)
+				plist, err := gctx.GetPackages(ctx, p.Path)
 				if err != nil {
 					return ps, errs.Wrap(err, errs.WithContext("Package.Path", p.Path))
 				}

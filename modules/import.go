@@ -9,15 +9,15 @@ import (
 )
 
 //ImportModules gets modules dependency information
-func ImportModules(ctx context.Context, name string, updFlag bool, opts ...golist.OptEnv) (*Modules, error) {
-	ps, err := packages.ImportPackages(ctx, name, opts...)
+func ImportModules(ctx context.Context, gctx golist.Context, name string, updFlag bool, withInternal bool) (*Modules, error) {
+	ps, err := packages.ImportPackages(ctx, gctx, name)
 	if err != nil {
 		return nil, errs.Wrap(err, errs.WithContext("name", name), errs.WithContext("updFlag", updFlag))
 	}
-	ms := importModules(ps)
+	ms := importModules(ps, withInternal)
 	if updFlag {
 		for _, m := range ms.List() {
-			ml, err := golist.GetModules(ctx, m.Name.Path, opts...)
+			ml, err := gctx.GetModules(ctx, m.Name.Path, true)
 			if err != nil {
 				return nil, errs.Wrap(err, errs.WithContext("path", m.Name.Path), errs.WithContext("updFlag", updFlag))
 			}
@@ -31,16 +31,20 @@ func ImportModules(ctx context.Context, name string, updFlag bool, opts ...golis
 	return ms, nil
 }
 
-func importModules(ps *packages.Packages) *Modules {
+func importModules(ps *packages.Packages, withInternal bool) *Modules {
 	ms := &Modules{list: []*Module{}}
 	for _, p := range ps.List() {
 		if m := ms.Add(p.Contained); m != nil {
-			m.SetPackage(p.Path)
+			if withInternal || (!withInternal && !p.IsInternal()) {
+				m.SetPackage(p)
+			}
 			for _, path := range p.Imports {
 				if dp := ps.Get(path); dp != nil {
 					if dm := m.SetDep(dp.Contained); dm != nil {
 						dm = ms.Set(dm)
-						dm.SetPackage(dp.Path)
+						if withInternal || (!withInternal && !dp.IsInternal()) {
+							dm.SetPackage(dp)
+						}
 					}
 				}
 			}

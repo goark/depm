@@ -109,6 +109,7 @@ Flags:
       --dot                 output by DOT language
       --dot-config string   config file for DOT language
   -h, --help                help for module
+  -i, --include-internal    include internal packages
 
 Global Flags:
       --cgo-enabled string   set CGO_ENABLED environment variable

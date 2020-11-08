@@ -37,7 +37,7 @@ func (c *Cmd) newExecCmd() (*exec.Cmd, error) {
 	if len(c.env) > 0 {
 		cmd.Env = append(os.Environ(), c.env...)
 	}
-	if c.hideWindow == true {
+	if c.hideWindow == true { //Windows only
 		cmd.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
 	}
 	return cmd, nil

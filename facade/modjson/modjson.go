@@ -17,48 +17,20 @@ type nodeJSON struct {
 }
 type moduleJSON struct {
 	Path     string
-	Main     bool     `json:",omitempty"`
+	Replace  string   `json:",omitempty"`
 	Latest   string   `json:",omitempty"`
+	Main     bool     `json:",omitempty"`
+	CGO      bool     `json:",omitempty"`
+	Unsafe   bool     `json:",omitempty"`
 	Packages []string `json:",omitempty"`
 }
 
 func (nj *moduleJSON) label() string {
 	name := nj.Path
 	if len(nj.Latest) > 0 {
-		name = fmt.Sprintf("%s (latest %s)", name, nj.Latest)
+		name += fmt.Sprintf(" (latest %s)", nj.Latest)
 	}
 	return name
-}
-
-func newModuleJSON(m *modules.Module) *moduleJSON {
-	mod := &moduleJSON{
-		Path: m.Name.String(),
-		Main: m.Main,
-	}
-	if !m.Update.IsZero() {
-		mod.Latest = m.Update.Version
-	}
-	if len(m.Packages) > 0 {
-		mod.Packages = make([]string, len(m.Packages), cap(m.Packages))
-		copy(mod.Packages, m.Packages)
-		sort.SliceStable(mod.Packages, func(i, j int) bool {
-			return mod.Packages[i] < mod.Packages[j]
-		})
-
-	}
-	return mod
-}
-
-func newNodeJSON(deps []*dependency.NodeModule) []nodeJSON {
-	nj := []nodeJSON{}
-	for _, n := range deps {
-		nd := nodeJSON{Module: newModuleJSON(n.Module), Deps: []*moduleJSON{}}
-		for _, m := range n.Deps {
-			nd.Deps = append(nd.Deps, newModuleJSON(m))
-		}
-		nj = append(nj, nd)
-	}
-	return nj
 }
 
 //Encode returns JSON formatted text from Node slice.
@@ -84,6 +56,42 @@ func EncodeDot(deps []*dependency.NodeModule, conf string) (string, error) {
 		return "", errs.Wrap(err, errs.WithContext("conf", conf))
 	}
 	return dot.ImportDeps(ds...).String(), nil
+}
+
+func newNodeJSON(deps []*dependency.NodeModule) []nodeJSON {
+	nj := []nodeJSON{}
+	for _, n := range deps {
+		nd := nodeJSON{Module: newModuleJSON(n.Module), Deps: []*moduleJSON{}}
+		for _, m := range n.Deps {
+			nd.Deps = append(nd.Deps, newModuleJSON(m))
+		}
+		nj = append(nj, nd)
+	}
+	return nj
+}
+
+func newModuleJSON(m *modules.Module) *moduleJSON {
+	mod := &moduleJSON{
+		Path:   m.Name.String(),
+		Main:   m.Main,
+		CGO:    m.UseCGO,
+		Unsafe: m.UseUnsafe,
+	}
+	if !m.Replace.IsZero() {
+		mod.Replace = m.Replace.String()
+	}
+	if !m.Update.IsZero() {
+		mod.Latest = m.Update.Version
+	}
+	if len(m.Packages) > 0 {
+		mod.Packages = make([]string, len(m.Packages), cap(m.Packages))
+		copy(mod.Packages, m.Packages)
+		sort.SliceStable(mod.Packages, func(i, j int) bool {
+			return mod.Packages[i] < mod.Packages[j]
+		})
+
+	}
+	return mod
 }
 
 /* Copyright 2020 Spiegel

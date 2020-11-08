@@ -5,80 +5,40 @@ import (
 	"context"
 	"encoding/json"
 	"io"
-	"io/ioutil"
-	"runtime"
 
 	"github.com/spiegel-im-spiegel/depm/subproc"
 	"github.com/spiegel-im-spiegel/errs"
 )
 
-type cmdLine struct {
-	argument      string
-	optGOARCH     string
-	optGOOS       string
-	optCgoEnabled string
-	errorWriter   io.Writer
+type Context interface {
+	GetPackagesRaw(context.Context, string) ([]byte, error)
+	GetPackages(context.Context, string) ([]Package, error)
+	GetModulesRaw(context.Context, string, bool) ([]byte, error)
+	GetModules(context.Context, string, bool) ([]Module, error)
 }
 
-//OptFunc is self-referential function for functional options pattern
-type OptEnv func(*cmdLine)
-
-func newCmdLine(arg string, opts ...OptEnv) *cmdLine {
-	cl := &cmdLine{argument: arg, optGOARCH: runtime.GOARCH, optGOOS: runtime.GOOS, optCgoEnabled: "1", errorWriter: ioutil.Discard}
-	for _, opt := range opts {
-		opt(cl)
-	}
-	return cl
+type ctx struct {
+	conf *config
 }
 
-func (cl *cmdLine) GetEnv() []string {
-	e := []string{}
-	if len(cl.optGOARCH) > 0 {
-		e = append(e, "GOARCH="+cl.optGOARCH)
-	}
-	if len(cl.optGOOS) > 0 {
-		e = append(e, "GOOS="+cl.optGOOS)
-	}
-	if len(cl.optCgoEnabled) > 0 {
-		e = append(e, "CGO_ENABLED="+cl.optCgoEnabled)
-	}
-	return e
-}
-
-//WithGOARCH returns setter function as type OptEnv
-func WithGOARCH(s string) OptEnv {
-	return func(cl *cmdLine) { cl.optGOARCH = s }
-}
-
-//WithGOOS returns setter function as type OptEnv
-func WithGOOS(s string) OptEnv {
-	return func(cl *cmdLine) { cl.optGOOS = s }
-}
-
-//WithCGOENABLED returns setter function as type OptEnv
-func WithCGOENABLED(s string) OptEnv {
-	return func(cl *cmdLine) { cl.optCgoEnabled = s }
-}
-
-//WithCGOENABLED returns setter function as type OptEnv
-func WithErrorWriter(w io.Writer) OptEnv {
-	return func(cl *cmdLine) { cl.errorWriter = w }
+func New(opts ...OptEnv) Context {
+	return &ctx{conf: newconfig(opts...)}
 }
 
 //GetPackagesRaw returns package information by JSON string
-func GetPackagesRaw(ctx context.Context, name string, opts ...OptEnv) ([]byte, error) {
-	cl := newCmdLine(name, opts...)
-	b, err := subproc.New("go", "list", "-json", cl.argument).
+func (c *ctx) GetPackagesRaw(ctx context.Context, name string) ([]byte, error) {
+	b, err := subproc.New("go", "list", "-json", name).
 		WithContext(ctx).
-		AddEnv(cl.GetEnv()...).
-		WithStderr(cl.errorWriter).
+		AddEnv(c.conf.GetEnv()...).
+		WithStderr(c.conf.errorWriter).
+		HideWindow(c.conf.flagHideWindow). //Windows only
 		Output()
 	return b, errs.Wrap(err, errs.WithContext("name", name))
 }
 
 //GetPackages returns package information
-func GetPackages(ctx context.Context, name string, opts ...OptEnv) ([]Package, error) {
-	b, err := GetPackagesRaw(ctx, name, opts...)
+func (c *ctx) GetPackages(ctx context.Context, name string) ([]Package, error) {
+	b, err := c.GetPackagesRaw(ctx, name)
 	if err != nil {
 		return nil, errs.Wrap(err, errs.WithContext("name", name))
 	}
@@ -98,19 +58,24 @@ func GetPackages(ctx context.Context, name string, opts ...OptEnv) ([]Package, e
 }
 
 //GetModulesRaw returns module information by JSON string
-func GetModulesRaw(ctx context.Context, name string, opts ...OptEnv) ([]byte, error) {
-	cl := newCmdLine(name, opts...)
-	b, err := subproc.New("go", "list", "-json", "-m", "-u", cl.argument).
+func (c *ctx) GetModulesRaw(ctx context.Context, name string, updFlag bool) ([]byte, error) {
+	args := []string{"list", "-json", "-m"}
+	if updFlag {
+		args = append(args, "-u")
+	}
+	args = append(args, name)
+	b, err := subproc.New("go", args...).
 		WithContext(ctx).
-		AddEnv(cl.GetEnv()...).
-		WithStderr(cl.errorWriter).
+		AddEnv(c.conf.GetEnv()...).
+		WithStderr(c.conf.errorWriter).
+		HideWindow(true). //Windows only
 		Output()
 	return b, errs.Wrap(err, errs.WithContext("name", name))
 }
 
 //GetModules returns module information
-func GetModules(ctx context.Context, name string, opts ...OptEnv) ([]Module, error) {
-	b, err := GetModulesRaw(ctx, name, opts...)
+func (c *ctx) GetModules(ctx context.Context, name string, updFlag bool) ([]Module, error) {
+	b, err := c.GetModulesRaw(ctx, name, updFlag)
 	if err != nil {
 		return nil, errs.Wrap(err, errs.WithContext("name", name))
 	}

@@ -2,20 +2,23 @@ package modules
 
 import (
 	"github.com/spiegel-im-spiegel/depm/golist"
+	"github.com/spiegel-im-spiegel/depm/packages"
 )
 
 //Module information
 type Module struct {
-	Name     Name     // module name (path and version)
-	Node     bool     // node module
-	Edge     bool     // edge module
-	Replace  Name     // replaced by this module
-	Main     bool     // is this the main module?
-	Indirect bool     // is this module only an indirect dependency of main module?
-	Update   Name     // available update, if any (with -u)
-	Packages []string // pakcages in this module
-	Deps     []Name   // dependency module names
-	Error    error    // error loading module
+	Name      Name     // module name (path and version)
+	Node      bool     // node module
+	Edge      bool     // edge module
+	Replace   Name     // replaced by this module
+	Main      bool     // is this the main module?
+	Indirect  bool     // is this module only an indirect dependency of main module?
+	Update    Name     // available update, if any (with -u)
+	Packages  []string // pakcages in this module
+	UseCGO    bool     // using cgo in this module
+	UseUnsafe bool     // include unsafe package in this module
+	Deps      []Name   // dependency module names
+	Error     error    // error loading module
 }
 
 func newModule(m *golist.Module, node, edge bool) *Module {
@@ -23,16 +26,18 @@ func newModule(m *golist.Module, node, edge bool) *Module {
 		return nil
 	}
 	mm := &Module{
-		Name:     newName(m.Path, m.Version),
-		Node:     node,
-		Edge:     edge,
-		Replace:  Name{},
-		Main:     m.Main,
-		Indirect: m.Indirect,
-		Update:   Name{},
-		Packages: []string{},
-		Deps:     []Name{},
-		Error:    m.GetError(),
+		Name:      newName(m.Path, m.Version),
+		Node:      node,
+		Edge:      edge,
+		Replace:   Name{},
+		Main:      m.Main,
+		Indirect:  m.Indirect,
+		Update:    Name{},
+		Packages:  []string{},
+		UseCGO:    false,
+		UseUnsafe: false,
+		Deps:      []Name{},
+		Error:     m.GetError(),
 	}
 	if m.Replace != nil {
 		mm.Replace = newName(m.Replace.Path, m.Replace.Version)
@@ -59,16 +64,18 @@ func (m *Module) EdgeOnly() bool {
 }
 
 //SetPackage sets package name to Module
-func (m *Module) SetPackage(pkg string) {
+func (m *Module) SetPackage(p *packages.Package) {
 	if m == nil {
 		return
 	}
 	for _, s := range m.Packages {
-		if s == pkg {
+		if s == p.Path {
 			return
 		}
 	}
-	m.Packages = append(m.Packages, pkg)
+	m.Packages = append(m.Packages, p.Path)
+	m.UseCGO = p.UseCGO
+	m.UseUnsafe = p.UseUnsafe
 }
 
 //SetDeps sets dependency module name to Module

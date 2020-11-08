@@ -51,7 +51,7 @@ func (c *Cmd) WithStderr(w io.Writer) *Cmd {
 	return c
 }
 
-//HideWindow method sets HideWindow attribution flag element
+//HideWindow method sets HideWindow attribution flag element (Windows only)
 func (c *Cmd) HideWindow(enable bool) *Cmd {
 	c.hideWindow = enable
 	return c

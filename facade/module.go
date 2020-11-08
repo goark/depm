@@ -3,6 +3,7 @@ package facade
 import (
 	"context"
 	"os"
+	"syscall"
 
 	"github.com/spf13/cobra"
 	"github.com/spiegel-im-spiegel/depm/dependency"
@@ -35,6 +36,10 @@ func newModuleCmd(ui *rwi.RWI) *cobra.Command {
 			if err != nil {
 				return debugPrint(ui, errs.New("Error in --check-update option", errs.WithCause(err)))
 			}
+			includeInternal, err := cmd.Flags().GetBool("include-internal")
+			if err != nil {
+				return debugPrint(ui, errs.New("Error in --include-internal option", errs.WithCause(err)))
+			}
 
 			//package path
 			path := "all" //local all packages
@@ -44,13 +49,17 @@ func newModuleCmd(ui *rwi.RWI) *cobra.Command {
 
 			//Run command
 			ms, err := modules.ImportModules(
-				signal.Context(context.Background(), os.Interrupt),
+				signal.Context(context.Background(), os.Interrupt, syscall.SIGTERM),
+				golist.New(
+					golist.WithGOARCH(goarchString),
+					golist.WithGOOS(goosString),
+					golist.WithCGOENABLED(cgoenabledString),
+					golist.WithErrorWriter(ui.ErrorWriter()),
+					golist.EnableHideWindow(), //Windows only
+				),
 				path,
 				updFlag,
-				golist.WithGOARCH(goarchString),
-				golist.WithGOOS(goosString),
-				golist.WithCGOENABLED(cgoenabledString),
-				golist.WithErrorWriter(ui.ErrorWriter()),
+				includeInternal,
 			)
 			if err != nil {
 				return debugPrint(ui, errs.Wrap(
@@ -94,6 +103,7 @@ func newModuleCmd(ui *rwi.RWI) *cobra.Command {
 	moduleCmd.Flags().BoolP("dot", "", false, "output by DOT language")
 	moduleCmd.Flags().StringP("dot-config", "", "", "config file for DOT language")
 	moduleCmd.Flags().BoolP("check-update", "u", false, "check updating module")
+	moduleCmd.Flags().BoolP("include-internal", "i", false, "include internal packages")
 
 	return moduleCmd
 }

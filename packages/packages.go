@@ -20,11 +20,25 @@ type Package struct {
 	DepOnly    bool           // package is only a dependency, not explicitly listed
 	Contained  *golist.Module // info about package's containing module, if any (can be nil)
 	Imports    []string       // import paths used by this package
+	UseCGO     bool           // use CGO in this package
+	UseUnsafe  bool           // use unsafe package in this package
 	Error      error          // error loading package
 }
 
 func newPackageName(name string, node, edge bool) *Package {
-	return &Package{Path: imports.VendorlessPath(name), Node: node, Edge: edge}
+	return &Package{
+		Path:      imports.VendorlessPath(name),
+		Node:      node,
+		Edge:      edge,
+		UseCGO:    isC(name),
+		UseUnsafe: isUnsafe(name),
+	}
+}
+func isC(name string) bool {
+	return strings.EqualFold(name, "C")
+}
+func isUnsafe(name string) bool {
+	return strings.EqualFold(name, "unsafe")
 }
 
 //Copy method copies elements of Package from golist.Package instance
@@ -41,9 +55,26 @@ func (p *Package) Copy(pp *golist.Package) *Package {
 	p.Contained = pp.Module
 	p.Error = pp.GetError()
 	if len(pp.Imports) > 0 {
-		p.Imports = make([]string, len(pp.Imports), cap(pp.Imports))
-		copy(p.Imports, pp.Imports)
+		p.Imports = make([]string, 0, cap(pp.Imports))
+		for _, path := range pp.Imports {
+			if isC(path) {
+				p.UseCGO = true
+			} else {
+				if isUnsafe(path) {
+					p.UseUnsafe = true
+				}
+				p.Imports = append(p.Imports, path)
+			}
+		}
 	}
+	// if !p.UseCGO && len(pp.Deps) > 0 {
+	// 	for _, path := range pp.Deps {
+	// 		if isC(path) {
+	// 			p.UseCGO = true
+	// 			break
+	// 		}
+	// 	}
+	// }
 	return p
 }
 
@@ -65,11 +96,6 @@ func (p *Package) EdgeOnly() bool {
 //IsStandard returns true if standard Go library
 func (p *Package) IsStandard() bool {
 	return p.Valid() && p.Goroot && p.Standard
-}
-
-//IsUnsafe returns true if unsafe package
-func (p *Package) IsUnsafe() bool {
-	return p.Valid() && (strings.EqualFold(p.Path, "unsafe") || strings.EqualFold(p.Path, "C"))
 }
 
 //IsInternal returns true if internal package

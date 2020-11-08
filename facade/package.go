@@ -3,6 +3,7 @@ package facade
 import (
 	"context"
 	"os"
+	"syscall"
 
 	"github.com/spf13/cobra"
 	"github.com/spiegel-im-spiegel/depm/dependency"
@@ -48,12 +49,15 @@ func newPackageCmd(ui *rwi.RWI) *cobra.Command {
 
 			//Run command
 			ps, err := packages.ImportPackages(
-				signal.Context(context.Background(), os.Interrupt),
+				signal.Context(context.Background(), os.Interrupt, syscall.SIGTERM),
+				golist.New(
+					golist.WithGOARCH(goarchString),
+					golist.WithGOOS(goosString),
+					golist.WithCGOENABLED(cgoenabledString),
+					golist.WithErrorWriter(ui.ErrorWriter()),
+					golist.EnableHideWindow(), //Windows only
+				),
 				path,
-				golist.WithGOARCH(goarchString),
-				golist.WithGOOS(goosString),
-				golist.WithCGOENABLED(cgoenabledString),
-				golist.WithErrorWriter(ui.ErrorWriter()),
 			)
 			if err != nil {
 				return debugPrint(ui, errs.Wrap(

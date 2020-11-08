@@ -2,6 +2,7 @@ package list
 
 import (
 	"context"
+	"sort"
 
 	"github.com/spiegel-im-spiegel/depm/golist"
 	"github.com/spiegel-im-spiegel/depm/packages"
@@ -9,8 +10,8 @@ import (
 )
 
 //ImportModules gets modules dependency information
-func ImportModules(ctx context.Context, name string, updFlag bool, opts ...golist.OptEnv) ([]*golist.Module, error) {
-	ps, err := packages.ImportPackages(ctx, name, opts...)
+func ImportModules(ctx context.Context, gctx golist.Context, name string, updFlag bool) ([]*golist.Module, error) {
+	ps, err := packages.ImportPackages(ctx, gctx, name)
 	if err != nil {
 		return nil, errs.Wrap(err, errs.WithContext("name", name), errs.WithContext("updFlag", updFlag))
 	}
@@ -20,7 +21,7 @@ func ImportModules(ctx context.Context, name string, updFlag bool, opts ...golis
 	}
 	if updFlag {
 		for _, m := range ms.List() {
-			ml, err := golist.GetModules(ctx, m.Path, opts...)
+			ml, err := gctx.GetModules(ctx, m.Path, true)
 			if err != nil {
 				return nil, errs.Wrap(err, errs.WithContext("path", m.Path), errs.WithContext("updFlag", updFlag))
 			}
@@ -29,7 +30,11 @@ func ImportModules(ctx context.Context, name string, updFlag bool, opts ...golis
 			}
 		}
 	}
-	return ms.List(), nil
+	list := ms.List()
+	sort.SliceStable(list, func(i, j int) bool {
+		return list[i].Name() < list[j].Name()
+	})
+	return list, nil
 }
 
 func searchModule(m *golist.Module, mlist []golist.Module) *golist.Module {

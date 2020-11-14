@@ -97,7 +97,10 @@ func newPackageCmd(ui *rwi.RWI) *cobra.Command {
 						errs.WithContext("includeStd", includeStd),
 					))
 				}
-				return ui.OutputBytes(b)
+				if err := ui.OutputBytes(b); err != nil {
+					return err
+				}
+				return ui.Outputln()
 			}
 		},
 	}

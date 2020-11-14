@@ -96,7 +96,10 @@ func newModuleCmd(ui *rwi.RWI) *cobra.Command {
 						errs.WithContext("path", path),
 					))
 				}
-				return ui.OutputBytes(b)
+				if err := ui.OutputBytes(b); err != nil {
+					return err
+				}
+				return ui.Outputln()
 			}
 		},
 	}

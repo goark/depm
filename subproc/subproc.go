@@ -71,9 +71,9 @@ func (c *Cmd) Output() ([]byte, error) {
 	b, err := cmd.Output()
 	return b, errs.Wrap(
 		err,
-		errs.WithContext("name", c.name),
-		errs.WithContext("args", c.args),
-		errs.WithContext("env", c.env),
+		errs.WithContext("cmd.Path", cmd.Path),
+		errs.WithContext("cmd.Args", cmd.Args),
+		errs.WithContext("cmd.Env", cmd.Env),
 	)
 }
 

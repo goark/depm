@@ -10,5 +10,3 @@ require (
 	github.com/spiegel-im-spiegel/gocli v0.10.4
 	golang.org/x/tools v0.1.0
 )
-
-replace github.com/coreos/etcd v3.3.13+incompatible => github.com/coreos/etcd v3.3.25+incompatible

@@ -5,10 +5,12 @@
 [![GitHub license](https://img.shields.io/badge/license-Apache%202-blue.svg)](https://raw.githubusercontent.com/spiegel-im-spiegel/depm/master/LICENSE)
 [![GitHub release](https://img.shields.io/github/release/spiegel-im-spiegel/depm.svg)](https://github.com/spiegel-im-spiegel/depm/releases/latest)
 
+This package is required Go 1.16 or later.
+
 ## Download and Build
 
 ```
-$ go get github.com/spiegel-im-spiegel/depm@latest
+$ go install github.com/spiegel-im-spiegel/depm@latest
 ```
 
 ### Binaries
@@ -189,5 +191,9 @@ golang.org/x/net v0.0.0-20201021035429-f5854403a974 [v0.0.0-20201031054903-ff519
 golang.org/x/tools v0.0.0-20201105220310-78b158585360
 golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1
 ```
+
+## Modules Requirement Graph
+
+[![dependency.png](./dependency.png)](./dependency.png)
 
 [depm]: https://github.com/spiegel-im-spiegel/depm "spiegel-im-spiegel/depm: Visualize depndency packages and modules"

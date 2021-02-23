@@ -2,7 +2,6 @@ package golist
 
 import (
 	"io"
-	"io/ioutil"
 	"runtime"
 )
 
@@ -22,7 +21,7 @@ func newconfig(opts ...OptEnv) *config {
 		optGOARCH:      runtime.GOARCH,
 		optGOOS:        runtime.GOOS,
 		optCgoEnabled:  "1",
-		errorWriter:    ioutil.Discard,
+		errorWriter:    io.Discard,
 		flagHideWindow: false,
 	}
 	for _, opt := range opts {

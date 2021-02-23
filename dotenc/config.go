@@ -1,7 +1,7 @@
 package dotenc
 
 import (
-	"io/ioutil"
+	"io"
 	"os"
 
 	"github.com/BurntSushi/toml"
@@ -25,7 +25,7 @@ func DecodeConfig(path string) (*Config, error) {
 	}
 	defer file.Close()
 
-	data, err := ioutil.ReadAll(file)
+	data, err := io.ReadAll(file)
 	if err != nil {
 		return nil, errs.Wrap(err, errs.WithContext("path", path))
 	}

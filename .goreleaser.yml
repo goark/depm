@@ -18,8 +18,6 @@ builds:
   - arm
   - arm64
   main: ./
-  flags:
-  - -trimpath
   ldflags: -s -w -X github.com/spiegel-im-spiegel/depm/facade.Version=v{{ .Version }}
   binary: depm
 

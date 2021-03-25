@@ -6,6 +6,7 @@ import (
 	"regexp"
 
 	"github.com/google/licenseclassifier"
+	"github.com/google/licenseclassifier/stringclassifier"
 )
 
 var (
@@ -26,7 +27,14 @@ func FindLicense(dir string) string {
 		if licenseRegexp.MatchString(f.Name()) {
 			path := filepath.Join(dir, f.Name())
 			if content, err := os.ReadFile(path); err == nil {
-				matches := classifier.MultipleMatch(string(content), true)
+				matches := func() stringclassifier.Matches {
+					defer func() {
+						if r := recover(); r != nil {
+							return
+						}
+					}()
+					return classifier.MultipleMatch(string(content), true)
+				}()
 				if len(matches) > 0 {
 					return matches[0].Name
 				}

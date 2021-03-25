@@ -10,6 +10,7 @@ type Module struct {
 	Name      Name     // module name (path and version)
 	Node      bool     // node module
 	Edge      bool     // edge module
+	License   string   // license of module
 	Replace   Name     // replaced by this module
 	Main      bool     // is this the main module?
 	Indirect  bool     // is this module only an indirect dependency of main module?
@@ -45,6 +46,11 @@ func newModule(m *golist.Module, node, edge bool) *Module {
 	if m.Update != nil {
 		mm.Update = newName(m.Update.Path, m.Update.Version)
 	}
+	if len(m.Dir) > 0 {
+		// fmt.Println(m.Dir)
+		mm.License = FindLicense(m.Dir)
+	}
+
 	return mm
 }
 
@@ -149,7 +155,7 @@ func (ms *Modules) List() []*Module {
 	return ms.list
 }
 
-/* Copyright 2020 Spiegel
+/* Copyright 2020-2021 Spiegel
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.

@@ -73,20 +73,28 @@ $ depm package "github.com/spiegel-im-spiegel/depm" | jq .
 [
   {
     "Package": {
-      "ImportPath": "github.com/spf13/cobra",
+      "ImportPath": "github.com/google/licenseclassifier",
       "Module": {
-        "Path": "github.com/spf13/cobra",
-        "Version": "v1.1.1"
+        "Path": "github.com/google/licenseclassifier",
+        "Version": "v0.0.0-20210324205846-148b633b0534",
+        "License": "Apache-2.0"
       }
     },
     "Deps": [
       {
-        "Package": {
-          "ImportPath": "github.com/spf13/pflag",
-          "Module": {
-            "Path": "github.com/spf13/pflag",
-            "Version": "v1.0.5"
-          }
+        "ImportPath": "github.com/google/licenseclassifier/stringclassifier",
+        "Module": {
+          "Path": "github.com/google/licenseclassifier",
+          "Version": "v0.0.0-20210324205846-148b633b0534",
+          "License": "Apache-2.0"
+        }
+      },
+      {
+        "ImportPath": "github.com/google/licenseclassifier/stringclassifier/searchset",
+        "Module": {
+          "Path": "github.com/google/licenseclassifier",
+          "Version": "v0.0.0-20210324205846-148b633b0534",
+          "License": "Apache-2.0"
         }
       }
     ]
@@ -123,16 +131,21 @@ $ depm module "github.com/spiegel-im-spiegel/depm" | jq .
 [
   {
     "Module": {
-      "Path": "github.com/spf13/cobra@v1.1.1",
+      "Path": "github.com/google/licenseclassifier@v0.0.0-20210324205846-148b633b0534",
+      "License": "Apache-2.0",
       "Packages": [
-        "github.com/spf13/cobra"
+        "github.com/google/licenseclassifier",
+        "github.com/google/licenseclassifier/stringclassifier",
+        "github.com/google/licenseclassifier/stringclassifier/searchset",
+        "github.com/google/licenseclassifier/stringclassifier/searchset/tokenizer"
       ]
     },
     "Deps": [
       {
-        "Path": "github.com/spf13/pflag@v1.0.5",
+        "Path": "github.com/sergi/go-diff@v1.0.0",
+        "License": "MIT",
         "Packages": [
-          "github.com/spf13/pflag"
+          "github.com/sergi/go-diff/diffmatchpatch"
         ]
       }
     ]
@@ -181,14 +194,17 @@ Global Flags:
 $ depm list -u "github.com/spiegel-im-spiegel/depm"
 github.com/BurntSushi/toml v0.3.1
 github.com/emicklei/dot v0.15.0
-github.com/spf13/cobra v1.1.1
+github.com/google/licenseclassifier v0.0.0-20210324205846-148b633b0534
+github.com/sergi/go-diff v1.0.0 [v1.1.0]
+github.com/spf13/cobra v1.1.3
 github.com/spf13/pflag v1.0.5
 github.com/spiegel-im-spiegel/depm
 github.com/spiegel-im-spiegel/errs v1.0.2
-github.com/spiegel-im-spiegel/gocli v0.10.3
-golang.org/x/mod v0.3.0
-golang.org/x/net v0.0.0-20201021035429-f5854403a974 [v0.0.0-20201031054903-ff519b6c9102]
-golang.org/x/tools v0.0.0-20201105220310-78b158585360
+github.com/spiegel-im-spiegel/gocli v0.10.4
+golang.org/x/mod v0.3.0 [v0.4.2]
+golang.org/x/net v0.0.0-20201021035429-f5854403a974 [v0.0.0-20210324205630-d1beb07c2056]
+golang.org/x/sys v0.0.0-20210119212857-b64e53b001e4 [v0.0.0-20210324051608-47abb6519492]
+golang.org/x/tools v0.1.0
 golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1
 ```
 

@@ -67,14 +67,6 @@ func (p *Package) Copy(pp *golist.Package) *Package {
 			}
 		}
 	}
-	// if !p.UseCGO && len(pp.Deps) > 0 {
-	// 	for _, path := range pp.Deps {
-	// 		if isC(path) {
-	// 			p.UseCGO = true
-	// 			break
-	// 		}
-	// 	}
-	// }
 	return p
 }
 

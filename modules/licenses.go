@@ -4,23 +4,20 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
-	"sync"
 
 	"github.com/google/licenseclassifier"
 )
 
 var (
-	licenseRegexp *regexp.Regexp
+	licenseRegexp = regexp.MustCompile(`^(?i)(LICEN(S|C)E|COPYING|README|NOTICE)(\..+)?$`)
 	classifier    *licenseclassifier.License
-	once          sync.Once
 )
 
-func FindLicense(dir string) string {
-	once.Do(func() {
-		licenseRegexp = regexp.MustCompile(`^(?i)(LICEN(S|C)E|COPYING|README|NOTICE)(\..+)?$`)
-		classifier, _ = licenseclassifier.New(licenseclassifier.DefaultConfidenceThreshold)
-	})
+func init() {
+	classifier, _ = licenseclassifier.New(licenseclassifier.DefaultConfidenceThreshold)
+}
 
+func FindLicense(dir string) string {
 	files, err := os.ReadDir(dir)
 	if err != nil {
 		return ""

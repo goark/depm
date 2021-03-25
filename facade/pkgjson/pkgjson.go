@@ -6,6 +6,7 @@ import (
 	"github.com/spiegel-im-spiegel/depm/dependency"
 	"github.com/spiegel-im-spiegel/depm/dotenc"
 	"github.com/spiegel-im-spiegel/depm/golist"
+	"github.com/spiegel-im-spiegel/depm/modules"
 	"github.com/spiegel-im-spiegel/depm/packages"
 	"github.com/spiegel-im-spiegel/errs"
 )
@@ -24,6 +25,7 @@ type packageJSON struct {
 type moduleJSON struct {
 	Path    string `json:",omitempty"`
 	Version string `json:",omitempty"`
+	License string `json:",omitempty"`
 }
 
 //Encode returns JSON formatted text from Node slice.
@@ -75,10 +77,14 @@ func newPackageJSON(p *packages.Package) *packageJSON {
 }
 
 func newModuleJSON(m *golist.Module) *moduleJSON {
-	return &moduleJSON{Path: m.Path, Version: m.Version}
+	var license string
+	if len(m.Dir) > 0 {
+		license = modules.FindLicense(m.Dir)
+	}
+	return &moduleJSON{Path: m.Path, Version: m.Version, License: license}
 }
 
-/* Copyright 2020 Spiegel
+/* Copyright 2020-2021 Spiegel
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.

@@ -22,6 +22,7 @@ type moduleJSON struct {
 	Main     bool     `json:",omitempty"`
 	CGO      bool     `json:",omitempty"`
 	Unsafe   bool     `json:",omitempty"`
+	License  string   `json:",omitempty"`
 	Packages []string `json:",omitempty"`
 }
 
@@ -72,10 +73,11 @@ func newNodeJSON(deps []*dependency.NodeModule) []nodeJSON {
 
 func newModuleJSON(m *modules.Module) *moduleJSON {
 	mod := &moduleJSON{
-		Path:   m.Name.String(),
-		Main:   m.Main,
-		CGO:    m.UseCGO,
-		Unsafe: m.UseUnsafe,
+		Path:    m.Name.String(),
+		Main:    m.Main,
+		CGO:     m.UseCGO,
+		Unsafe:  m.UseUnsafe,
+		License: m.License,
 	}
 	if !m.Replace.IsZero() {
 		mod.Replace = m.Replace.String()
@@ -94,7 +96,7 @@ func newModuleJSON(m *modules.Module) *moduleJSON {
 	return mod
 }
 
-/* Copyright 2020 Spiegel
+/* Copyright 2020-2021 Spiegel
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.

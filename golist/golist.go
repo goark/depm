@@ -6,8 +6,8 @@ import (
 	"encoding/json"
 	"io"
 
-	"github.com/spiegel-im-spiegel/depm/subproc"
-	"github.com/spiegel-im-spiegel/errs"
+	"github.com/goark/depm/subproc"
+	"github.com/goark/errs"
 )
 
 type Context interface {

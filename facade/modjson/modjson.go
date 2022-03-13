@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"sort"
 
-	"github.com/spiegel-im-spiegel/depm/dependency"
-	"github.com/spiegel-im-spiegel/depm/dotenc"
-	"github.com/spiegel-im-spiegel/depm/modules"
-	"github.com/spiegel-im-spiegel/errs"
+	"github.com/goark/depm/dependency"
+	"github.com/goark/depm/dotenc"
+	"github.com/goark/depm/modules"
+	"github.com/goark/errs"
 )
 
 type nodeJSON struct {

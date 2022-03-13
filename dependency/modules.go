@@ -3,7 +3,7 @@ package dependency
 import (
 	"sort"
 
-	"github.com/spiegel-im-spiegel/depm/modules"
+	"github.com/goark/depm/modules"
 )
 
 //EdgePackage is Graph of dependent packages

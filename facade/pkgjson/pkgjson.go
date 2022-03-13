@@ -3,12 +3,12 @@ package pkgjson
 import (
 	"encoding/json"
 
-	"github.com/spiegel-im-spiegel/depm/dependency"
-	"github.com/spiegel-im-spiegel/depm/dotenc"
-	"github.com/spiegel-im-spiegel/depm/golist"
-	"github.com/spiegel-im-spiegel/depm/modules"
-	"github.com/spiegel-im-spiegel/depm/packages"
-	"github.com/spiegel-im-spiegel/errs"
+	"github.com/goark/depm/dependency"
+	"github.com/goark/depm/dotenc"
+	"github.com/goark/depm/golist"
+	"github.com/goark/depm/modules"
+	"github.com/goark/depm/packages"
+	"github.com/goark/errs"
 )
 
 type nodeJSON struct {

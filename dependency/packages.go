@@ -3,7 +3,7 @@ package dependency
 import (
 	"sort"
 
-	"github.com/spiegel-im-spiegel/depm/packages"
+	"github.com/goark/depm/packages"
 )
 
 //NodePackage is Graph of dependent packages

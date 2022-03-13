@@ -5,14 +5,14 @@ import (
 	"os"
 	"syscall"
 
+	"github.com/goark/depm/dependency"
+	"github.com/goark/depm/facade/modjson"
+	"github.com/goark/depm/golist"
+	"github.com/goark/depm/modules"
+	"github.com/goark/errs"
+	"github.com/goark/gocli/rwi"
+	"github.com/goark/gocli/signal"
 	"github.com/spf13/cobra"
-	"github.com/spiegel-im-spiegel/depm/dependency"
-	"github.com/spiegel-im-spiegel/depm/facade/modjson"
-	"github.com/spiegel-im-spiegel/depm/golist"
-	"github.com/spiegel-im-spiegel/depm/modules"
-	"github.com/spiegel-im-spiegel/errs"
-	"github.com/spiegel-im-spiegel/gocli/rwi"
-	"github.com/spiegel-im-spiegel/gocli/signal"
 )
 
 //newModuleCmd returns cobra.Command instance for show sub-command

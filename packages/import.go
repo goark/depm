@@ -3,8 +3,8 @@ package packages
 import (
 	"context"
 
-	"github.com/spiegel-im-spiegel/depm/golist"
-	"github.com/spiegel-im-spiegel/errs"
+	"github.com/goark/depm/golist"
+	"github.com/goark/errs"
 )
 
 //ImportPackages gets packages dependency information

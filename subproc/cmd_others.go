@@ -1,4 +1,5 @@
-//+build !windows
+//go:build !windows
+// +build !windows
 
 package subproc
 
@@ -7,7 +8,7 @@ import (
 	"os/exec"
 	"runtime"
 
-	"github.com/spiegel-im-spiegel/errs"
+	"github.com/goark/errs"
 )
 
 func (c *Cmd) newExecCmd() (*exec.Cmd, error) {

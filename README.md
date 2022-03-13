@@ -1,21 +1,23 @@
 # [depm] -- Visualize depndency packages and modules
 
-[![check vulns](https://github.com/spiegel-im-spiegel/depm/workflows/vulns/badge.svg)](https://github.com/spiegel-im-spiegel/depm/actions)
-[![lint status](https://github.com/spiegel-im-spiegel/depm/workflows/lint/badge.svg)](https://github.com/spiegel-im-spiegel/depm/actions)
-[![GitHub license](https://img.shields.io/badge/license-Apache%202-blue.svg)](https://raw.githubusercontent.com/spiegel-im-spiegel/depm/master/LICENSE)
-[![GitHub release](https://img.shields.io/github/release/spiegel-im-spiegel/depm.svg)](https://github.com/spiegel-im-spiegel/depm/releases/latest)
+[![check vulns](https://github.com/goark/depm/workflows/vulns/badge.svg)](https://github.com/goark/depm/actions)
+[![lint status](https://github.com/goark/depm/workflows/lint/badge.svg)](https://github.com/goark/depm/actions)
+[![GitHub license](https://img.shields.io/badge/license-Apache%202-blue.svg)](https://raw.githubusercontent.com/goark/depm/master/LICENSE)
+[![GitHub release](https://img.shields.io/github/release/goark/depm.svg)](https://github.com/goark/depm/releases/latest)
 
 This package is required Go 1.16 or later.
+
+**Migrated repository to [github.com/goark/depm][depm]**
 
 ## Download and Build
 
 ```
-$ go install github.com/spiegel-im-spiegel/depm@latest
+$ go install github.com/goark/depm@latest
 ```
 
 ### Binaries
 
-See [latest release](https://github.com/spiegel-im-spiegel/depm/releases/latest).
+See [latest release](https://github.com/goark/depm/releases/latest).
 
 ## Usage
 
@@ -69,7 +71,7 @@ Global Flags:
       --goarch string        set GOARCH environment variable
       --goos string          set GOOS environment variable
 
-$ depm package "github.com/spiegel-im-spiegel/depm" | jq .
+$ depm package "github.com/goark/depm" | jq .
 [
   {
     "Package": {
@@ -127,7 +129,7 @@ Global Flags:
       --goarch string        set GOARCH environment variable
       --goos string          set GOOS environment variable
 
-$ depm module "github.com/spiegel-im-spiegel/depm" | jq .
+$ depm module "github.com/goark/depm" | jq .
 [
   {
     "Module": {
@@ -163,7 +165,7 @@ $ depm module "github.com/spiegel-im-spiegel/depm" | jq .
 ```
 
 ```
-$ depm module --dot --dot-config dotenc/sample.toml "github.com/spiegel-im-spiegel/depm" | dot -Tpng -o output.png
+$ depm module --dot --dot-config dotenc/sample.toml "github.com/goark/depm" | dot -Tpng -o output.png
 ```
 
 [![output.png](./output.png)](./output.png)
@@ -191,16 +193,16 @@ Global Flags:
       --goarch string        set GOARCH environment variable
       --goos string          set GOOS environment variable
 
-$ depm list -u "github.com/spiegel-im-spiegel/depm"
+$ depm list -u "github.com/goark/depm"
 github.com/BurntSushi/toml v0.3.1
 github.com/emicklei/dot v0.15.0
 github.com/google/licenseclassifier v0.0.0-20210324205846-148b633b0534
 github.com/sergi/go-diff v1.0.0 [v1.1.0]
 github.com/spf13/cobra v1.1.3
 github.com/spf13/pflag v1.0.5
-github.com/spiegel-im-spiegel/depm
-github.com/spiegel-im-spiegel/errs v1.0.2
-github.com/spiegel-im-spiegel/gocli v0.10.4
+github.com/goark/depm
+github.com/goark/errs v1.0.2
+github.com/goark/gocli v0.10.4
 golang.org/x/mod v0.3.0 [v0.4.2]
 golang.org/x/net v0.0.0-20201021035429-f5854403a974 [v0.0.0-20210324205630-d1beb07c2056]
 golang.org/x/sys v0.0.0-20210119212857-b64e53b001e4 [v0.0.0-20210324051608-47abb6519492]
@@ -212,4 +214,4 @@ golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1
 
 [![dependency.png](./dependency.png)](./dependency.png)
 
-[depm]: https://github.com/spiegel-im-spiegel/depm "spiegel-im-spiegel/depm: Visualize depndency packages and modules"
+[depm]: https://github.com/goark/depm "goark/depm: Visualize depndency packages and modules"

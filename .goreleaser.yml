@@ -1,7 +1,7 @@
 project_name: depm
 release:
   github:
-    owner: spiegel-im-spiegel
+    owner: goark
     name: depm
 
 builds:
@@ -20,7 +20,7 @@ builds:
   main: ./
   flags:
   - -trimpath
-  ldflags: -s -w -X github.com/spiegel-im-spiegel/depm/facade.Version=v{{ .Version }}
+  ldflags: -s -w -X github.com/goark/depm/facade.Version=v{{ .Version }}
   binary: depm
 
 archives:

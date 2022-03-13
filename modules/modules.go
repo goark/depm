@@ -1,8 +1,8 @@
 package modules
 
 import (
-	"github.com/spiegel-im-spiegel/depm/golist"
-	"github.com/spiegel-im-spiegel/depm/packages"
+	"github.com/goark/depm/golist"
+	"github.com/goark/depm/packages"
 )
 
 //Module information

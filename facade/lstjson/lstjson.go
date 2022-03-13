@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/spiegel-im-spiegel/depm/golist"
-	"github.com/spiegel-im-spiegel/errs"
+	"github.com/goark/depm/golist"
+	"github.com/goark/errs"
 )
 
 //Encode returns JSON formatted text from Module list.

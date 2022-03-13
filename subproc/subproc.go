@@ -4,7 +4,7 @@ import (
 	"context"
 	"io"
 
-	"github.com/spiegel-im-spiegel/errs"
+	"github.com/goark/errs"
 )
 
 //Cmd is context of subprocess

@@ -3,7 +3,7 @@ package packages
 import (
 	"strings"
 
-	"github.com/spiegel-im-spiegel/depm/golist"
+	"github.com/goark/depm/golist"
 	"golang.org/x/tools/imports"
 )
 

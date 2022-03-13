@@ -4,9 +4,9 @@ import (
 	"context"
 	"sort"
 
-	"github.com/spiegel-im-spiegel/depm/golist"
-	"github.com/spiegel-im-spiegel/depm/packages"
-	"github.com/spiegel-im-spiegel/errs"
+	"github.com/goark/depm/golist"
+	"github.com/goark/depm/packages"
+	"github.com/goark/errs"
 )
 
 //ImportModules gets modules dependency information

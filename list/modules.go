@@ -1,6 +1,6 @@
 package list
 
-import "github.com/spiegel-im-spiegel/depm/golist"
+import "github.com/goark/depm/golist"
 
 //Modules is list of Modules.
 type Modules struct {

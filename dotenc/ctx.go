@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/emicklei/dot"
-	"github.com/spiegel-im-spiegel/errs"
+	"github.com/goark/errs"
 )
 
 //Ctx is context class for parsing

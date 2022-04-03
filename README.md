@@ -30,6 +30,7 @@ Usage:
   depm [command]
 
 Available Commands:
+  completion  Generate the autocompletion script for the specified shell
   help        Help about any command
   list        list modules
   module      analyze depndency modules
@@ -71,35 +72,28 @@ Global Flags:
       --goarch string        set GOARCH environment variable
       --goos string          set GOOS environment variable
 
-$ depm package "github.com/goark/depm" | jq .
+$ cd /path/to/depm
+$ depm package | jq .
 [
   {
     "Package": {
-      "ImportPath": "github.com/google/licenseclassifier",
+      "ImportPath": "github.com/BurntSushi/toml",
       "Module": {
-        "Path": "github.com/google/licenseclassifier",
-        "Version": "v0.0.0-20210324205846-148b633b0534",
-        "License": "Apache-2.0"
+        "Path": "github.com/BurntSushi/toml",
+        "Version": "v1.0.0",
+        "License": "MIT"
       }
-    },
-    "Deps": [
-      {
-        "ImportPath": "github.com/google/licenseclassifier/stringclassifier",
-        "Module": {
-          "Path": "github.com/google/licenseclassifier",
-          "Version": "v0.0.0-20210324205846-148b633b0534",
-          "License": "Apache-2.0"
-        }
-      },
-      {
-        "ImportPath": "github.com/google/licenseclassifier/stringclassifier/searchset",
-        "Module": {
-          "Path": "github.com/google/licenseclassifier",
-          "Version": "v0.0.0-20210324205846-148b633b0534",
-          "License": "Apache-2.0"
-        }
+    }
+  },
+  {
+    "Package": {
+      "ImportPath": "github.com/emicklei/dot",
+      "Module": {
+        "Path": "github.com/emicklei/dot",
+        "Version": "v0.16.0",
+        "License": "MIT"
       }
-    ]
+    }
   },
 ...
 ```
@@ -129,28 +123,26 @@ Global Flags:
       --goarch string        set GOARCH environment variable
       --goos string          set GOOS environment variable
 
-$ depm module "github.com/goark/depm" | jq .
+$ cd /path/to/depm
+$ depm module | jq .
 [
   {
     "Module": {
-      "Path": "github.com/google/licenseclassifier@v0.0.0-20210324205846-148b633b0534",
-      "License": "Apache-2.0",
+      "Path": "github.com/BurntSushi/toml@v1.0.0",
+      "License": "MIT",
       "Packages": [
-        "github.com/google/licenseclassifier",
-        "github.com/google/licenseclassifier/stringclassifier",
-        "github.com/google/licenseclassifier/stringclassifier/searchset",
-        "github.com/google/licenseclassifier/stringclassifier/searchset/tokenizer"
+        "github.com/BurntSushi/toml"
       ]
-    },
-    "Deps": [
-      {
-        "Path": "github.com/sergi/go-diff@v1.0.0",
-        "License": "MIT",
-        "Packages": [
-          "github.com/sergi/go-diff/diffmatchpatch"
-        ]
-      }
-    ]
+    }
+  },
+  {
+    "Module": {
+      "Path": "github.com/emicklei/dot@v0.16.0",
+      "License": "MIT",
+      "Packages": [
+        "github.com/emicklei/dot"
+      ]
+    }
   },
   ...
 ```
@@ -165,7 +157,8 @@ $ depm module "github.com/goark/depm" | jq .
 ```
 
 ```
-$ depm module --dot --dot-config dotenc/sample.toml "github.com/goark/depm" | dot -Tpng -o output.png
+$ cd /path/to/depm
+$ depm module --dot --dot-config dotenc/sample.toml | dot -Tpng -o output.png
 ```
 
 [![output.png](./output.png)](./output.png)
@@ -193,20 +186,20 @@ Global Flags:
       --goarch string        set GOARCH environment variable
       --goos string          set GOOS environment variable
 
-$ depm list -u "github.com/goark/depm"
-github.com/BurntSushi/toml v0.3.1
-github.com/emicklei/dot v0.15.0
-github.com/google/licenseclassifier v0.0.0-20210324205846-148b633b0534
-github.com/sergi/go-diff v1.0.0 [v1.1.0]
-github.com/spf13/cobra v1.1.3
-github.com/spf13/pflag v1.0.5
+$ cd /path/to/depm
+$ depm list
+github.com/BurntSushi/toml v1.0.0
+github.com/emicklei/dot v0.16.0
 github.com/goark/depm
-github.com/goark/errs v1.0.2
-github.com/goark/gocli v0.10.4
-golang.org/x/mod v0.3.0 [v0.4.2]
-golang.org/x/net v0.0.0-20201021035429-f5854403a974 [v0.0.0-20210324205630-d1beb07c2056]
-golang.org/x/sys v0.0.0-20210119212857-b64e53b001e4 [v0.0.0-20210324051608-47abb6519492]
-golang.org/x/tools v0.1.0
+github.com/goark/errs v1.1.0
+github.com/goark/gocli v0.12.0
+github.com/google/licenseclassifier v0.0.0-20210722185704-3043a050f148
+github.com/sergi/go-diff v1.0.0
+github.com/spf13/cobra v1.4.0
+github.com/spf13/pflag v1.0.5
+golang.org/x/mod v0.5.1
+golang.org/x/sys v0.0.0-20211019181941-9d821ace8654
+golang.org/x/tools v0.1.9
 golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1
 ```
 

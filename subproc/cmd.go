@@ -1,6 +1,3 @@
-//go:build !windows
-// +build !windows
-
 package subproc
 
 import (
@@ -12,7 +9,7 @@ import (
 )
 
 func (c *Cmd) newExecCmd() (*exec.Cmd, error) {
-	path, err := LookPath(c.name)
+	path, err := exec.LookPath(c.name)
 	if err != nil {
 		return nil, errs.Wrap(
 			err,
@@ -41,7 +38,7 @@ func (c *Cmd) newExecCmd() (*exec.Cmd, error) {
 	return cmd, nil
 }
 
-/* Copyright 2020 Spiegel
+/* Copyright 2020-2022 Spiegel
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.

@@ -7,7 +7,7 @@ require (
 	github.com/emicklei/dot v1.0.0
 	github.com/goark/errs v1.1.0
 	github.com/goark/gocli v0.12.0
-	github.com/google/licenseclassifier/v2 v2.0.0-pre6
+	github.com/google/licenseclassifier/v2 v2.0.0
 	github.com/spf13/cobra v1.5.0
 	golang.org/x/tools v0.1.12
 )

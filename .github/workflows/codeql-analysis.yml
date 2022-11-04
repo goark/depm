@@ -27,6 +27,8 @@ jobs:
       actions: read
       contents: read
 
+    using: 'node16'
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3

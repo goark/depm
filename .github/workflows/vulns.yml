@@ -16,7 +16,7 @@ jobs:
       - name: install depm
         run: |
           pushd $RUNNER_TEMP
-          curl -Lfs -o depm.tar.gz https://github.com/goark/depm/releases/download/v0.6.4/depm_0.6.5_Linux_64bit.tar.gz
+          curl -Lfs -o depm.tar.gz https://github.com/goark/depm/releases/download/v0.6.5/depm_0.6.5_Linux_64bit.tar.gz
           sudo tar -xzf depm.tar.gz
           sudo mv depm /usr/local/bin/depm
           popd

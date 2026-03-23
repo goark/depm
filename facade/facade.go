@@ -27,8 +27,8 @@ var (
 func newRootCmd(ui *rwi.RWI, args []string) *cobra.Command {
 	rootCmd := &cobra.Command{
 		Use:   Name,
-		Short: "Visualize depndency packages and modules",
-		Long:  "Visualize depndency packages and modules.",
+		Short: "Visualize dependency packages and modules",
+		Long:  "Visualize dependency packages and modules.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return debugPrint(ui, errs.Wrap(ecode.ErrNoCommand))
 		},

@@ -20,8 +20,8 @@ func newModuleCmd(ui *rwi.RWI) *cobra.Command {
 	moduleCmd := &cobra.Command{
 		Use:     "module [flags] [package import path]",
 		Aliases: []string{"mod", "m"},
-		Short:   "analyze depndency modules",
-		Long:    "analyze depndency modules.",
+		Short:   "analyze dependency modules",
+		Long:    "analyze dependency modules.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			//Options
 			dotFlag, err := cmd.Flags().GetBool("dot")

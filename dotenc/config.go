@@ -3,40 +3,47 @@ package dotenc
 import (
 	"io"
 	"os"
+	"path/filepath"
 
 	"github.com/BurntSushi/toml"
 	"github.com/goark/errs"
 )
 
-//Config is configuration class
+// Config is configuration class
 type Config struct {
 	Node map[string]interface{} `toml:"node"`
 	Edge map[string]interface{} `toml:"edge"`
 }
 
-//Decode returns Config instance from stream
-func DecodeConfig(path string) (*Config, error) {
+// Decode returns Config instance from stream
+func DecodeConfig(path string) (cfg *Config, err error) {
 	if len(path) == 0 {
-		return &Config{Node: map[string]interface{}{}, Edge: map[string]interface{}{}}, nil
+		cfg = &Config{Node: map[string]interface{}{}, Edge: map[string]interface{}{}}
+		return
 	}
-	file, err := os.Open(path)
-	if err != nil {
-		return nil, errs.Wrap(err, errs.WithContext("path", path))
+	file, ferr := os.Open(filepath.Clean(path))
+	if ferr != nil {
+		err = errs.Wrap(ferr, errs.WithContext("path", path))
+		return
 	}
-	defer file.Close()
+	defer func() {
+		err = errs.Join(err, file.Close())
+	}()
 
-	data, err := io.ReadAll(file)
-	if err != nil {
-		return nil, errs.Wrap(err, errs.WithContext("path", path))
+	data, ferr := io.ReadAll(file)
+	if ferr != nil {
+		err = errs.Wrap(ferr, errs.WithContext("path", path))
+		return
 	}
-	c := &Config{}
-	if err := toml.Unmarshal(data, c); err != nil {
-		return nil, errs.Wrap(err, errs.WithContext("path", path))
+	cfg = &Config{}
+	if terr := toml.Unmarshal(data, cfg); terr != nil {
+		err = errs.Wrap(terr, errs.WithContext("path", path))
+		return
 	}
-	return c, nil
+	return
 }
 
-/* Copyright 2020 Spiegel
+/* Copyright 2020-2026 Spiegel
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.

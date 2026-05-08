@@ -26,7 +26,7 @@ func FindLicense(dir string) string {
 	for _, f := range files {
 		if licenseRegexp.MatchString(f.Name()) {
 			path := filepath.Join(dir, f.Name())
-			if content, err := os.ReadFile(path); err == nil {
+			if content, err := os.ReadFile(filepath.Clean(path)); err == nil {
 				if res := classifier.Match(content); len(res.Matches) > 0 {
 					return res.Matches[0].Name
 				}
@@ -36,7 +36,7 @@ func FindLicense(dir string) string {
 	return ""
 }
 
-/* Copyright 2021-2022 Spiegel
+/* Copyright 2021-2026 Spiegel
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.

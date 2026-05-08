@@ -3,6 +3,7 @@ package subproc
 import (
 	"os"
 	"os/exec"
+	"path/filepath"
 	"runtime"
 
 	"github.com/goark/errs"
@@ -21,10 +22,12 @@ func (c *Cmd) newExecCmd() (*exec.Cmd, error) {
 		)
 	}
 	var cmd *exec.Cmd
+	// temporary exclude gosec[G204]: Argument validity is verified by the caller (golist/golist.go)
+	// see .glangci.yml
 	if c.ctx != nil {
-		cmd = exec.CommandContext(c.ctx, path, c.args...)
+		cmd = exec.CommandContext(c.ctx, filepath.Clean(path), c.args...)
 	} else {
-		cmd = exec.Command(path, c.args...)
+		cmd = exec.Command(filepath.Clean(path), c.args...)
 	}
 	if c.reader != nil {
 		cmd.Stdin = c.reader
@@ -38,7 +41,7 @@ func (c *Cmd) newExecCmd() (*exec.Cmd, error) {
 	return cmd, nil
 }
 
-/* Copyright 2020-2022 Spiegel
+/* Copyright 2020-2026 Spiegel
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.

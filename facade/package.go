@@ -20,8 +20,8 @@ func newPackageCmd(ui *rwi.RWI) *cobra.Command {
 	packageCmd := &cobra.Command{
 		Use:     "package [flags] [package import path]",
 		Aliases: []string{"pkg", "p"},
-		Short:   "analyze depndency packages",
-		Long:    "analyze depndency packages.",
+		Short:   "analyze dependency packages",
+		Long:    "analyze dependency packages.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			//Options
 			dotFlag, err := cmd.Flags().GetBool("dot")

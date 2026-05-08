@@ -1,4 +1,4 @@
-# [depm] -- Visualize depndency packages and modules
+# [depm] -- Visualize dependency packages and modules
 
 [![check vulns](https://github.com/goark/depm/workflows/vulns/badge.svg)](https://github.com/goark/depm/actions)
 [![lint status](https://github.com/goark/depm/workflows/lint/badge.svg)](https://github.com/goark/depm/actions)
@@ -23,7 +23,7 @@ See [latest release](https://github.com/goark/depm/releases/latest).
 
 ```
 $ depm -h
-Visualize depndency packages and modules.
+Visualize dependency packages and modules.
 
 Usage:
   depm [flags]
@@ -33,8 +33,8 @@ Available Commands:
   completion  Generate the autocompletion script for the specified shell
   help        Help about any command
   list        list modules
-  module      analyze depndency modules
-  package     analyze depndency packages
+  module      analyze dependency modules
+  package     analyze dependency packages
   version     print the version number
 
 Flags:
@@ -47,11 +47,11 @@ Flags:
 Use "depm [command] --help" for more information about a command.
 ```
 
-### Analyze Depndency Packages
+### Analyze dependency Packages
 
 ```
 $ depm package -h
-analyze depndency packages.
+analyze dependency packages.
 
 Usage:
   depm package [flags] [package import path]
@@ -98,11 +98,11 @@ $ depm package | jq .
 ...
 ```
 
-### Analyze Depndency Modules
+### Analyze dependency Modules
 
 ```
 $ depm module -h
-analyze depndency modules.
+analyze dependency modules.
 
 Usage:
   depm module [flags] [package import path]
@@ -207,4 +207,4 @@ golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1
 
 [![dependency.png](./dependency.png)](./dependency.png)
 
-[depm]: https://github.com/goark/depm "goark/depm: Visualize depndency packages and modules"
+[depm]: https://github.com/goark/depm "goark/depm: Visualize dependency packages and modules"

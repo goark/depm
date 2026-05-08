@@ -1,6 +1,5 @@
 # [depm] -- Visualize dependency packages and modules
 
-[![check vulns](https://github.com/goark/depm/workflows/vulns/badge.svg)](https://github.com/goark/depm/actions)
 [![lint status](https://github.com/goark/depm/workflows/lint/badge.svg)](https://github.com/goark/depm/actions)
 [![GitHub license](https://img.shields.io/badge/license-Apache%202-blue.svg)](https://raw.githubusercontent.com/goark/depm/master/LICENSE)
 [![GitHub release](https://img.shields.io/github/release/goark/depm.svg)](https://github.com/goark/depm/releases/latest)
